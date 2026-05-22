@@ -1,0 +1,185 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate controlled reality experiments, observed-vs-assumed divergence, human chaos, fatigue, and false-confidence resistance.",
+  "scenarios": [
+    {
+      "id": "unsafe-uncontrolled-experiment",
+      "name": "Unsupervised live experiment is blocked",
+      "input": {
+        "experiment": {
+          "supervisorAssigned": false,
+          "rollbackAuthorityAssigned": false,
+          "auditTrailEnabled": false,
+          "participantConsentRecorded": false,
+          "maxParticipants": 120,
+          "durationHours": 8,
+          "incidentCategories": ["medical", "violent-crime"],
+          "liveDispatchEnabled": true,
+          "manualApprovalRequired": false
+        }
+      },
+      "expectedDecision": "do-not-run-or-stop-experiment"
+    },
+    {
+      "id": "observed-reality-breaks-assumptions",
+      "name": "Observed field behavior overrides simulated confidence",
+      "input": {
+        "experiment": {
+          "supervisorAssigned": true,
+          "rollbackAuthorityAssigned": true,
+          "auditTrailEnabled": true,
+          "participantConsentRecorded": true,
+          "maxParticipants": 20,
+          "durationHours": 2,
+          "incidentCategories": ["medical", "help"],
+          "liveDispatchEnabled": false,
+          "manualApprovalRequired": true
+        },
+        "assumptions": {
+          "p95SmsLatencySeconds": 120,
+          "p95ResponderAckSeconds": 180,
+          "p95OperatorDecisionSeconds": 90,
+          "p95GpsDriftMeters": 60,
+          "lowBatteryFailureRate": 0.08,
+          "syncDivergenceRate": 0.005,
+          "institutionalNonResponseRate": 0.15
+        },
+        "observed": {
+          "p95SmsLatencySeconds": 430,
+          "p95ResponderAckSeconds": 540,
+          "p95OperatorDecisionSeconds": 380,
+          "p95GpsDriftMeters": 220,
+          "lowBatteryFailureRate": 0.42,
+          "syncDivergenceRate": 0.06,
+          "institutionalNonResponseRate": 0.52
+        }
+      },
+      "expectedDecision": "pause-and-investigate-reality-gap"
+    },
+    {
+      "id": "human-chaos-restricts-field-exposure",
+      "name": "Human confusion and hesitation force reduced scope",
+      "input": {
+        "experiment": {
+          "supervisorAssigned": true,
+          "rollbackAuthorityAssigned": true,
+          "auditTrailEnabled": true,
+          "participantConsentRecorded": true,
+          "maxParticipants": 30,
+          "durationHours": 3,
+          "incidentCategories": ["medical", "help"],
+          "liveDispatchEnabled": false,
+          "manualApprovalRequired": true
+        },
+        "human": {
+          "confusionUnderStressRate": 0.5,
+          "inconsistentEscalationRate": 0.58,
+          "panicMisuseRate": 0.32,
+          "fatigueDegradationRate": 0.55,
+          "supervisionDependenceRate": 0.62,
+          "emotionalOverloadRate": 0.48,
+          "delayedSituationalComprehensionRate": 0.54
+        }
+      },
+      "expectedDecision": "restricted-shadow-or-supervised-experiment"
+    },
+    {
+      "id": "false-confidence-stops-experiment",
+      "name": "Cosmetic stability signals stop validation",
+      "input": {
+        "experiment": {
+          "supervisorAssigned": true,
+          "rollbackAuthorityAssigned": true,
+          "auditTrailEnabled": true,
+          "participantConsentRecorded": true,
+          "maxParticipants": 15,
+          "durationHours": 2,
+          "incidentCategories": ["help"],
+          "liveDispatchEnabled": false,
+          "manualApprovalRequired": true
+        },
+        "falseConfidence": {
+          "recoveryConfidence": 0.92,
+          "postRecoveryVerificationRate": 0.5,
+          "replayCertaintyScore": 0.9,
+          "hiddenReplayConflictRate": 0.03,
+          "degradedModeActiveMinutes": 80,
+          "dashboardShowsNormal": true,
+          "operatorConfusionReports": 2,
+          "operatorClarityScore": 0.9,
+          "syncDriftDetected": 4,
+          "syncDriftDisplayed": 1,
+          "governanceReviewSkippedCount": 1,
+          "governanceHealthScore": 0.88
+        }
+      },
+      "expectedDecision": "do-not-run-or-stop-experiment"
+    },
+    {
+      "id": "controlled-observable-experiment",
+      "name": "Small supervised observation may run with strict controls",
+      "input": {
+        "experiment": {
+          "supervisorAssigned": true,
+          "rollbackAuthorityAssigned": true,
+          "auditTrailEnabled": true,
+          "participantConsentRecorded": true,
+          "maxParticipants": 25,
+          "durationHours": 2,
+          "incidentCategories": ["medical", "help"],
+          "liveDispatchEnabled": false,
+          "manualApprovalRequired": true
+        },
+        "assumptions": {
+          "p95SmsLatencySeconds": 150,
+          "p95ResponderAckSeconds": 220,
+          "p95OperatorDecisionSeconds": 120,
+          "p95GpsDriftMeters": 80,
+          "lowBatteryFailureRate": 0.12,
+          "syncDivergenceRate": 0.01,
+          "institutionalNonResponseRate": 0.2
+        },
+        "observed": {
+          "p95SmsLatencySeconds": 170,
+          "p95ResponderAckSeconds": 240,
+          "p95OperatorDecisionSeconds": 140,
+          "p95GpsDriftMeters": 95,
+          "lowBatteryFailureRate": 0.14,
+          "syncDivergenceRate": 0.012,
+          "institutionalNonResponseRate": 0.22
+        },
+        "human": {
+          "confusionUnderStressRate": 0.12,
+          "inconsistentEscalationRate": 0.1,
+          "panicMisuseRate": 0.08,
+          "fatigueDegradationRate": 0.1,
+          "supervisionDependenceRate": 0.2,
+          "emotionalOverloadRate": 0.1,
+          "delayedSituationalComprehensionRate": 0.12
+        },
+        "fatigue": {
+          "operatorPerformanceDecayRate": 0.1,
+          "responderReliabilityDecayRate": 0.12,
+          "supervisionOverloadAccumulation": 0.1,
+          "degradedModeNormalizationRisk": 0.08,
+          "alertFatigueRate": 0.1,
+          "governanceReviewFatigueRate": 0.1
+        },
+        "falseConfidence": {
+          "recoveryConfidence": 0.6,
+          "postRecoveryVerificationRate": 0.95,
+          "replayCertaintyScore": 0.6,
+          "hiddenReplayConflictRate": 0,
+          "degradedModeActiveMinutes": 0,
+          "dashboardShowsNormal": false,
+          "operatorConfusionReports": 0,
+          "syncDriftDetected": 1,
+          "syncDriftDisplayed": 1,
+          "governanceReviewSkippedCount": 0
+        }
+      },
+      "expectedDecision": "run-controlled-reality-experiment"
+    }
+  ]
+}

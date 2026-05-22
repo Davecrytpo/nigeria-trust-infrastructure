@@ -1,0 +1,142 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate pre-deployment civic governance, trust safeguards, liability controls, pilot supervision, and activation decisions.",
+  "scenarios": [
+    {
+      "id": "readiness-gates-not-passed",
+      "name": "High maturity but readiness gates not passed",
+      "input": {
+        "deployment": {
+          "readinessScore": 0.9,
+          "governanceReadiness": 0.9,
+          "trustDurabilityScore": 0.88,
+          "institutionalReliabilityScore": 0.82,
+          "auditCompleteness": 0.92,
+          "convergencePassed": false,
+          "fieldReadinessPassed": false,
+          "reviewBoardApproved": true,
+          "unresolvedCriticalRisks": 0
+        },
+        "safeguards": {
+          "transparencyCoverage": 0.9,
+          "operatorAccountability": 0.9,
+          "appealMechanismCoverage": 0.88,
+          "misuseReportingAvailability": 0.88,
+          "auditVisibilityScore": 0.9,
+          "privacyMinimizationScore": 0.92,
+          "antiSurveillanceBoundaryScore": 0.95
+        },
+        "liability": {
+          "responderMisconductRisk": 0.18,
+          "operatorNegligenceRisk": 0.16,
+          "delayedCoordinationRisk": 0.2,
+          "institutionalNonResponseRisk": 0.24,
+          "telecomFailureRisk": 0.28,
+          "escalationDisputeRisk": 0.18,
+          "evidenceIntegrityRisk": 0.12
+        },
+        "pilot": {
+          "supervisionCoverage": 0.9,
+          "incidentReviewBoardReadiness": 0.9,
+          "responderCertificationCoverage": 0.88,
+          "auditScheduleCompliance": 0.88,
+          "escalationCommitteeReadiness": 0.86,
+          "fieldCoordinatorCoverage": 0.9,
+          "shutdownProcedureReadiness": 0.9
+        }
+      },
+      "expectedDecision": "limited-supervised-pilot-only"
+    },
+    {
+      "id": "liability-severe-freeze",
+      "name": "Severe liability and evidence integrity risk",
+      "input": {
+        "deployment": {
+          "readinessScore": 0.82,
+          "governanceReadiness": 0.82,
+          "trustDurabilityScore": 0.76,
+          "institutionalReliabilityScore": 0.72,
+          "auditCompleteness": 0.7,
+          "convergencePassed": false,
+          "fieldReadinessPassed": false,
+          "reviewBoardApproved": false,
+          "unresolvedCriticalRisks": 2
+        },
+        "safeguards": {
+          "transparencyCoverage": 0.7,
+          "operatorAccountability": 0.68,
+          "appealMechanismCoverage": 0.62,
+          "misuseReportingAvailability": 0.7,
+          "auditVisibilityScore": 0.64,
+          "privacyMinimizationScore": 0.78,
+          "antiSurveillanceBoundaryScore": 0.82
+        },
+        "liability": {
+          "responderMisconductRisk": 0.9,
+          "operatorNegligenceRisk": 0.82,
+          "delayedCoordinationRisk": 0.78,
+          "institutionalNonResponseRisk": 0.7,
+          "telecomFailureRisk": 0.6,
+          "escalationDisputeRisk": 0.7,
+          "evidenceIntegrityRisk": 0.86
+        },
+        "pilot": {
+          "supervisionCoverage": 0.72,
+          "incidentReviewBoardReadiness": 0.68,
+          "responderCertificationCoverage": 0.66,
+          "auditScheduleCompliance": 0.62,
+          "escalationCommitteeReadiness": 0.64,
+          "fieldCoordinatorCoverage": 0.7,
+          "shutdownProcedureReadiness": 0.58
+        }
+      },
+      "expectedDecision": "emergency-freeze"
+    },
+    {
+      "id": "governed-controlled-pilot",
+      "name": "Governed controlled pilot with all approvals",
+      "input": {
+        "deployment": {
+          "readinessScore": 0.95,
+          "governanceReadiness": 0.94,
+          "trustDurabilityScore": 0.9,
+          "institutionalReliabilityScore": 0.88,
+          "auditCompleteness": 0.96,
+          "convergencePassed": true,
+          "fieldReadinessPassed": true,
+          "reviewBoardApproved": true,
+          "unresolvedCriticalRisks": 0
+        },
+        "safeguards": {
+          "transparencyCoverage": 0.92,
+          "operatorAccountability": 0.94,
+          "appealMechanismCoverage": 0.9,
+          "misuseReportingAvailability": 0.88,
+          "auditVisibilityScore": 0.9,
+          "privacyMinimizationScore": 0.94,
+          "antiSurveillanceBoundaryScore": 0.95
+        },
+        "liability": {
+          "responderMisconductRisk": 0.12,
+          "operatorNegligenceRisk": 0.12,
+          "delayedCoordinationRisk": 0.18,
+          "institutionalNonResponseRisk": 0.2,
+          "telecomFailureRisk": 0.22,
+          "escalationDisputeRisk": 0.14,
+          "evidenceIntegrityRisk": 0.1
+        },
+        "pilot": {
+          "supervisionCoverage": 0.94,
+          "incidentReviewBoardReadiness": 0.92,
+          "responderCertificationCoverage": 0.9,
+          "auditScheduleCompliance": 0.9,
+          "escalationCommitteeReadiness": 0.88,
+          "fieldCoordinatorCoverage": 0.9,
+          "shutdownProcedureReadiness": 0.92
+        }
+      },
+      "expectedDecision": "approve-controlled-pilot"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+name: resident_mobile
+description: "Nigeria Emergency, Trust & Human Infrastructure - Resident Mobile (Android-First)"
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  geolocator: ^10.1.0
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  http: ^1.1.0
+  web_socket_channel: ^2.4.0
+  provider: ^6.0.5
+  cryptography: ^2.7.0
+  flutter_secure_storage: ^9.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true

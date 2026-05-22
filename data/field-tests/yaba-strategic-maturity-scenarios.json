@@ -1,0 +1,103 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate long-horizon trust durability, institutional realism, regional readiness, and governance posture.",
+  "scenarios": [
+    {
+      "id": "multi-week-chronic-instability",
+      "name": "Multi-week chronic telecom, overload, and replay instability",
+      "input": {
+        "history": {
+          "weeksObserved": 6,
+          "telecomDegradedDays": 24,
+          "operatorOverloadHours": 420,
+          "disasterModeActivations": 9,
+          "responderDropoutRate": 0.28,
+          "avgResponderHoursPerWeek": 64,
+          "replayDivergenceEvents": 92,
+          "institutionalAcknowledgmentRate": 0.48
+        },
+        "trust": {
+          "responderReliabilityTrend": 0.48,
+          "operatorConfidenceTrend": 0.54,
+          "institutionalParticipationConsistency": 0.5,
+          "recurringFalseReportRegionRate": 0.38,
+          "chronicInstabilityZoneRate": 0.44,
+          "trustVolatilityRate": 0.4
+        },
+        "institutions": [
+          {
+            "acknowledgmentRate": 0.5,
+            "handoffCompletionRate": 0.45,
+            "communicationContinuity": 0.42,
+            "authorityClarity": 0.46,
+            "overloadRate": 0.58
+          }
+        ],
+        "governance": {
+          "auditBacklogRate": 0.42
+        }
+      },
+      "expectedPosture": "restricted-expansion"
+    },
+    {
+      "id": "severe-ecosystem-trust-erosion",
+      "name": "Severe ecosystem trust erosion and institutional drift",
+      "input": {
+        "history": {
+          "weeksObserved": 8,
+          "telecomDegradedDays": 38,
+          "operatorOverloadHours": 760,
+          "disasterModeActivations": 16,
+          "responderDropoutRate": 0.46,
+          "avgResponderHoursPerWeek": 72,
+          "replayDivergenceEvents": 210,
+          "institutionalAcknowledgmentRate": 0.22
+        },
+        "trust": {
+          "responderReliabilityTrend": 0.25,
+          "operatorConfidenceTrend": 0.3,
+          "institutionalParticipationConsistency": 0.28,
+          "recurringFalseReportRegionRate": 0.74,
+          "chronicInstabilityZoneRate": 0.78,
+          "trustVolatilityRate": 0.72
+        },
+        "institutions": [
+          {
+            "acknowledgmentRate": 0.28,
+            "handoffCompletionRate": 0.32,
+            "communicationContinuity": 0.28,
+            "authorityClarity": 0.3,
+            "overloadRate": 0.76,
+            "professionalismIncidentRate": 0.44
+          }
+        ],
+        "governance": {
+          "auditBacklogRate": 0.9
+        }
+      },
+      "expectedPosture": "freeze-expansion"
+    }
+  ],
+  "regions": [
+    {
+      "id": "yaba-core",
+      "telecomReliability": 0.78,
+      "institutionalCapacity": 0.72,
+      "responderDensity": 0.8,
+      "operatorCoverage": 0.76,
+      "governanceReadiness": 0.82,
+      "degradationDiversity": 0.2
+    },
+    {
+      "id": "peri-urban-edge",
+      "telecomReliability": 0.42,
+      "institutionalCapacity": 0.38,
+      "responderDensity": 0.34,
+      "operatorCoverage": 0.46,
+      "governanceReadiness": 0.4,
+      "degradationDiversity": 0.7
+    }
+  ],
+  "expectedBlockedRegions": ["peri-urban-edge"]
+}

@@ -1,0 +1,383 @@
+{
+  "generatedAt": "2026-05-22T14:55:07.701Z",
+  "evidenceDir": null,
+  "readiness": {
+    "status": "evidence-incomplete",
+    "blockers": [
+      "runtime validation has not passed on live containers",
+      "failure drills have not passed on live containers",
+      "mobile validation has not passed on a real device/emulator",
+      "live telecom provider validation has not passed",
+      "production environment validation has not passed"
+    ]
+  },
+  "pilotPreparation": {
+    "status": "blocked",
+    "scope": {
+      "geography": "Yaba neighborhood only",
+      "responderCount": "limited",
+      "operatorConcurrency": "limited",
+      "incidentCategories": "low-risk only",
+      "shutdown": "instant supervisor shutdown required",
+      "logging": "immutable operational logging required",
+      "escalation": "supervisor-controlled escalation only"
+    },
+    "blockerPolicy": "No live pilot execution until all live runtime, telecom, Android, security, and observability evidence is verified."
+  },
+  "summary": {
+    "runtimeValidation": "missing",
+    "failureDrills": "missing",
+    "mobileValidation": "failed",
+    "telecomValidation": "missing",
+    "productionEnvValidation": "failed",
+    "securityAudit": "passed",
+    "commandFailures": [],
+    "runtimeMeasurements": {},
+    "failureDrillCount": 0,
+    "mobileDevice": {
+      "id": "local-smoke",
+      "model": "not-connected",
+      "androidVersion": "unknown",
+      "batterySaver": false,
+      "networkProfile": "none"
+    },
+    "telecomProviders": []
+  },
+  "operationalEvidence": {
+    "runtimeProof": [
+      {
+        "name": "Docker Compose startup",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "migration sequencing",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "seed execution",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "Redis Streams recovery",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "Postgres persistence",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "worker orchestration",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "SSE synchronization",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "Prometheus metrics",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "Grafana availability",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "API restart recovery",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "Redis restart recovery",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "Postgres restart recovery",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      }
+    ],
+    "failureDrills": [
+      {
+        "name": "Redis outage",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "API node restart",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "worker crash",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "queue replay recovery",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "dead-letter recovery",
+        "status": "missing",
+        "files": [],
+        "detail": "No live dead-letter drill report was found."
+      },
+      {
+        "name": "SSE reconnect storm",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "telecom failover",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "partial network partition",
+        "status": "missing",
+        "files": [],
+        "detail": "No live partition drill artifact was found."
+      }
+    ],
+    "telecomProof": [
+      {
+        "name": "Twilio send and receipt",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "Africa's Talking send and receipt",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "Infobip send and receipt",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "webhook signatures",
+        "status": "verified",
+        "files": [
+          "reports\\security\\security-audit-2026-05-22T14-54-35-210Z.json"
+        ],
+        "detail": ""
+      },
+      {
+        "name": "delayed receipts",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      },
+      {
+        "name": "duplicate suppression",
+        "status": "verified",
+        "files": [
+          "reports\\security\\security-audit-2026-05-22T14-54-35-210Z.json"
+        ],
+        "detail": ""
+      },
+      {
+        "name": "reconciliation integrity",
+        "status": "verified",
+        "files": [
+          "reports\\security\\security-audit-2026-05-22T14-54-35-210Z.json"
+        ],
+        "detail": ""
+      },
+      {
+        "name": "provider outage behavior",
+        "status": "missing",
+        "files": [],
+        "detail": ""
+      }
+    ],
+    "androidProof": [
+      {
+        "name": "offline encrypted queue durability",
+        "status": "failed",
+        "files": [
+          "reports\\mobile\\device-validation-2026-05-21T23-48-27-802Z.json"
+        ],
+        "detail": ""
+      },
+      {
+        "name": "reboot persistence",
+        "status": "failed",
+        "files": [
+          "reports\\mobile\\device-validation-2026-05-21T23-48-27-802Z.json"
+        ],
+        "detail": ""
+      },
+      {
+        "name": "app-kill recovery",
+        "status": "failed",
+        "files": [
+          "reports\\mobile\\device-validation-2026-05-21T23-48-27-802Z.json"
+        ],
+        "detail": ""
+      },
+      {
+        "name": "low battery mode",
+        "status": "failed",
+        "files": [
+          "reports\\mobile\\device-validation-2026-05-21T23-48-27-802Z.json"
+        ],
+        "detail": ""
+      },
+      {
+        "name": "GPS degradation",
+        "status": "failed",
+        "files": [
+          "reports\\mobile\\device-validation-2026-05-21T23-48-27-802Z.json"
+        ],
+        "detail": ""
+      },
+      {
+        "name": "background execution restrictions",
+        "status": "failed",
+        "files": [
+          "reports\\mobile\\device-validation-2026-05-21T23-48-27-802Z.json"
+        ],
+        "detail": ""
+      },
+      {
+        "name": "SMS fallback activation",
+        "status": "failed",
+        "files": [
+          "reports\\mobile\\device-validation-2026-05-21T23-48-27-802Z.json"
+        ],
+        "detail": ""
+      },
+      {
+        "name": "replay sync recovery",
+        "status": "failed",
+        "files": [
+          "reports\\mobile\\device-validation-2026-05-21T23-48-27-802Z.json"
+        ],
+        "detail": ""
+      }
+    ],
+    "securityProof": [
+      {
+        "name": "session hijack resistance",
+        "status": "verified",
+        "files": [
+          "reports\\security\\security-audit-2026-05-22T14-54-35-210Z.json"
+        ],
+        "detail": ""
+      },
+      {
+        "name": "replay attack validation",
+        "status": "verified",
+        "files": [
+          "reports\\security\\security-audit-2026-05-22T14-54-35-210Z.json"
+        ],
+        "detail": ""
+      },
+      {
+        "name": "RBAC boundary validation",
+        "status": "verified",
+        "files": [
+          "reports\\security\\security-audit-2026-05-22T14-54-35-210Z.json"
+        ],
+        "detail": ""
+      },
+      {
+        "name": "brute-force protection",
+        "status": "verified",
+        "files": [
+          "reports\\security\\security-audit-2026-05-22T14-54-35-210Z.json"
+        ],
+        "detail": ""
+      },
+      {
+        "name": "refresh token misuse",
+        "status": "verified",
+        "files": [
+          "reports\\security\\security-audit-2026-05-22T14-54-35-210Z.json"
+        ],
+        "detail": ""
+      },
+      {
+        "name": "audit immutability",
+        "status": "missing",
+        "files": [],
+        "detail": "No immutable audit log tamper drill artifact was found."
+      },
+      {
+        "name": "webhook signature tampering",
+        "status": "verified",
+        "files": [
+          "reports\\security\\security-audit-2026-05-22T14-54-35-210Z.json"
+        ],
+        "detail": ""
+      },
+      {
+        "name": "secret rotation",
+        "status": "failed",
+        "files": [
+          "reports\\runtime\\production-env-validation-2026-05-22T14-52-39-950Z.json"
+        ],
+        "detail": "Requires live rotated secrets and restart evidence."
+      }
+    ]
+  },
+  "reports": {
+    "runtimeValidationReports": [],
+    "failureDrillReports": [],
+    "mobileReports": [
+      "reports\\mobile\\device-validation-2026-05-21T23-48-27-802Z.json"
+    ],
+    "telecomReports": [],
+    "productionEnvReports": [
+      "reports\\runtime\\production-env-validation-2026-05-22T00-25-06-541Z.json",
+      "reports\\runtime\\production-env-validation-2026-05-22T14-52-39-950Z.json"
+    ],
+    "securityReports": [
+      "reports\\security\\security-audit-2026-05-22T00-43-40-552Z.json",
+      "reports\\security\\security-audit-2026-05-22T00-44-19-898Z.json",
+      "reports\\security\\security-audit-2026-05-22T14-54-35-210Z.json"
+    ]
+  },
+  "requiredLiveProof": [
+    "runtime:validate on Docker-capable Linux host",
+    "runtime:failure-drills on Docker-capable Linux host",
+    "mobile:capture-validation from Android app-kill/reboot/offline replay tests",
+    "telecom provider sandbox/live receipt and failover evidence",
+    "Prometheus/Grafana scrape and dashboard evidence",
+    "security:audit evidence for session, RBAC, webhook, rate limit, and pilot controls"
+  ]
+}

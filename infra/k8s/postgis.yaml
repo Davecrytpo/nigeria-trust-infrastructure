@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nigeria-trust-postgis
+spec:
+  serviceName: nigeria-trust-postgis
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nigeria-trust-postgis
+  template:
+    metadata:
+      labels:
+        app: nigeria-trust-postgis
+    spec:
+      containers:
+        - name: postgis
+          image: postgis/postgis:16-3.4-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: nigeria_trust
+            - name: POSTGRES_USER
+              value: nigeria_trust
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nigeria-trust-secrets
+                  key: postgres-password
+          volumeMounts:
+            - name: postgis-data
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "nigeria_trust", "-d", "nigeria_trust"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: postgis-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 20Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nigeria-trust-postgis
+spec:
+  selector:
+    app: nigeria-trust-postgis
+  ports:
+    - port: 5432
+      targetPort: 5432

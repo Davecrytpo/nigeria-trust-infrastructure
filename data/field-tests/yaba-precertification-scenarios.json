@@ -1,0 +1,99 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate pre-certification evidence quality, observed field truth, blind-spot discovery, human factors, governance durability, and certification state.",
+  "scenarios": [
+    {
+      "id": "field-truth-overrides-simulation",
+      "name": "Observed field truth invalidates optimistic assumptions",
+      "input": {
+        "readinessGates": { "field": false, "stress": false, "convergence": false },
+        "fieldTruth": {
+          "p95SmsLatencySeconds": 360,
+          "androidBackgroundFailureRate": 0.34,
+          "lowBatterySurvivalRate": 0.58,
+          "p95GpsDriftMeters": 180,
+          "p95ResponderAckSeconds": 420,
+          "operatorSaturationRate": 0.38,
+          "institutionalResponseConsistency": 0.52
+        },
+        "blindSpots": {
+          "syncDivergenceDetected": 1,
+          "syncDivergenceVisible": 1,
+          "replayConflictRate": 0,
+          "confidenceNormalizationEvents": 0,
+          "degradedModeMinutes": 0,
+          "escalationTimingVarianceSeconds": 60,
+          "telecomPartialFailureDetected": 1,
+          "telecomPartialFailureVisible": 1
+        },
+        "human": {
+          "responderHesitationRate": 0.2,
+          "operatorOverloadReactionFailureRate": 0.18,
+          "panicMisuseRate": 0.12,
+          "escalationDisciplineScore": 0.78,
+          "fatigueMistakeRate": 0.18,
+          "supervisionEffectivenessScore": 0.8,
+          "uncertaintyCommunicationQuality": 0.76
+        },
+        "governance": {
+          "reviewDisciplineScore": 0.82,
+          "governanceFatigueRate": 0.16,
+          "policyDriftRate": 0.16,
+          "oversightErosionRate": 0.14,
+          "supervisorOverloadRate": 0.18,
+          "institutionalCoordinationBreakdownRate": 0.22
+        }
+      },
+      "expectedState": "restricted-supervised-validation"
+    },
+    {
+      "id": "critical-blind-spots",
+      "name": "Critical hidden fragility blocks certification",
+      "input": {
+        "readinessGates": { "field": false, "stress": false, "convergence": false },
+        "fieldTruth": {
+          "p95SmsLatencySeconds": 180,
+          "androidBackgroundFailureRate": 0.08,
+          "lowBatterySurvivalRate": 0.82,
+          "p95GpsDriftMeters": 90,
+          "p95ResponderAckSeconds": 220,
+          "operatorSaturationRate": 0.16,
+          "institutionalResponseConsistency": 0.78
+        },
+        "blindSpots": {
+          "syncDivergenceDetected": 4,
+          "syncDivergenceVisible": 1,
+          "replayConflictRate": 0.03,
+          "replayConflictVisibility": 0.5,
+          "confidenceNormalizationEvents": 2,
+          "postRecoveryVerificationRate": 0.6,
+          "degradedModeMinutes": 90,
+          "degradedModeOperatorAwareness": 0.5,
+          "escalationTimingVarianceSeconds": 240,
+          "operatorMisunderstandingReports": 1,
+          "telecomPartialFailureDetected": 3,
+          "telecomPartialFailureVisible": 1
+        },
+        "human": {
+          "responderHesitationRate": 0.12,
+          "operatorOverloadReactionFailureRate": 0.12,
+          "panicMisuseRate": 0.08,
+          "escalationDisciplineScore": 0.84,
+          "fatigueMistakeRate": 0.12,
+          "supervisionEffectivenessScore": 0.86,
+          "uncertaintyCommunicationQuality": 0.82
+        },
+        "governance": {
+          "reviewDisciplineScore": 0.86,
+          "governanceFatigueRate": 0.12,
+          "policyDriftRate": 0.1,
+          "oversightErosionRate": 0.1,
+          "supervisorOverloadRate": 0.12,
+          "institutionalCoordinationBreakdownRate": 0.16
+        }
+      },
+      "expectedState": "not-certified"
+    }
+  ]
+}

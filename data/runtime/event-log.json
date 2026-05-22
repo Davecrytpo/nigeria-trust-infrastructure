@@ -1,0 +1,127 @@
+{
+  "cursor": 8,
+  "events": [
+    {
+      "id": "evt-mpfydxh0-w0y1gf",
+      "sequence": 1,
+      "incidentId": "inc-qwipcb",
+      "type": "incident.created",
+      "actor": "resident",
+      "payload": {
+        "incidentType": "fire",
+        "severity": "high",
+        "sharePreciseLocation": true
+      },
+      "idempotencyKey": "incident:inc-qwipcb:created",
+      "recordedAt": "2026-05-21T20:38:38.004Z"
+    },
+    {
+      "id": "evt-mpfydxiu-e78mcr",
+      "sequence": 2,
+      "incidentId": "inc-qwipcb",
+      "type": "incident.dispatched",
+      "actor": "ops",
+      "payload": {
+        "assignedResponderId": "rsp-tade",
+        "event": {
+          "id": "evt-zso4ud",
+          "type": "dispatched",
+          "message": "Tade Bakare was assigned to the incident.",
+          "actor": "ops",
+          "at": "2026-05-21T20:38:38.053Z"
+        }
+      },
+      "idempotencyKey": "incident:inc-qwipcb:dispatch:rsp-tade",
+      "recordedAt": "2026-05-21T20:38:38.070Z"
+    },
+    {
+      "id": "evt-mpfydxld-xifa9k",
+      "sequence": 3,
+      "incidentId": "inc-bfit3c",
+      "type": "incident.created",
+      "actor": "resident",
+      "payload": {
+        "incidentType": "medical",
+        "severity": "moderate",
+        "sharePreciseLocation": false
+      },
+      "idempotencyKey": "incident:inc-bfit3c:created",
+      "recordedAt": "2026-05-21T20:38:38.161Z"
+    },
+    {
+      "id": "evt-mpfydxmk-lu2ii3",
+      "sequence": 4,
+      "incidentId": "inc-bsj5ji",
+      "type": "incident.created",
+      "actor": "resident",
+      "payload": {
+        "incidentType": "medical",
+        "severity": "high",
+        "sharePreciseLocation": false
+      },
+      "idempotencyKey": "incident:inc-bsj5ji:created",
+      "recordedAt": "2026-05-21T20:38:38.204Z"
+    },
+    {
+      "id": "evt-mpfyffj0-77sjtk",
+      "sequence": 5,
+      "incidentId": "inc-lwmgdm",
+      "type": "incident.created",
+      "actor": "resident",
+      "payload": {
+        "incidentType": "fire",
+        "severity": "high",
+        "sharePreciseLocation": true
+      },
+      "idempotencyKey": "incident:inc-lwmgdm:created",
+      "recordedAt": "2026-05-21T20:39:48.060Z"
+    },
+    {
+      "id": "evt-mpfyffjl-m9r96z",
+      "sequence": 6,
+      "incidentId": "inc-lwmgdm",
+      "type": "incident.dispatched",
+      "actor": "ops",
+      "payload": {
+        "assignedResponderId": "rsp-tade",
+        "event": {
+          "id": "evt-ah8xyd",
+          "type": "dispatched",
+          "message": "Tade Bakare was assigned to the incident.",
+          "actor": "ops",
+          "at": "2026-05-21T20:39:48.077Z"
+        }
+      },
+      "idempotencyKey": "incident:inc-lwmgdm:dispatch:rsp-tade",
+      "recordedAt": "2026-05-21T20:39:48.081Z"
+    },
+    {
+      "id": "evt-mpfyffm2-s4ec4q",
+      "sequence": 7,
+      "incidentId": "inc-m4t3rw",
+      "type": "incident.created",
+      "actor": "resident",
+      "payload": {
+        "incidentType": "medical",
+        "severity": "moderate",
+        "sharePreciseLocation": false
+      },
+      "idempotencyKey": "incident:inc-m4t3rw:created",
+      "recordedAt": "2026-05-21T20:39:48.170Z"
+    },
+    {
+      "id": "evt-mpfyffmy-7abeu5",
+      "sequence": 8,
+      "incidentId": "inc-ywz4pn",
+      "type": "incident.created",
+      "actor": "resident",
+      "payload": {
+        "incidentType": "medical",
+        "severity": "high",
+        "sharePreciseLocation": false
+      },
+      "idempotencyKey": "incident:inc-ywz4pn:created",
+      "recordedAt": "2026-05-21T20:39:48.202Z"
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate human-understandable explanations, uncertainty visibility, governance interpretability, community trust legibility, accountability traceability, and anti-surveillance boundaries.",
+  "scenarios": [
+    {
+      "id": "opaque-automation-under-uncertainty",
+      "name": "Opaque automation is blocked when uncertainty and trace gaps exist",
+      "input": {
+        "readinessGatesFailed": true,
+        "dashboardShowsPreciseConfidence": true,
+        "autoActionAllowed": true,
+        "decision": {
+          "actionType": "uncertaintyFreeze",
+          "recommendedAction": "hold live escalation",
+          "reasons": ["conflicting telemetry", "telecom receipts delayed"],
+          "constraints": ["manual supervisor review"],
+          "uncertainty": {
+            "incompleteInformationRate": 0.5,
+            "confidenceVolatility": 0.4,
+            "telecomUncertainty": 0.6,
+            "degradedStateActive": true
+          }
+        },
+        "governance": {
+          "recommendation": "freeze-expansion",
+          "certificationWithheld": true,
+          "reasons": ["readiness gates failed"],
+          "restrictions": ["no expansion"]
+        },
+        "conflictingReality": {
+          "sources": { "operator": 0.9, "responder": 0.3, "telemetry": 0.4 },
+          "telecomInconsistent": true
+        },
+        "trace": {
+          "traceId": "trace-opaque",
+          "reason": "uncertainty freeze"
+        }
+      },
+      "expectedLegibilityBand": "unsafe-opaque",
+      "expectedAction": "pause-action-and-restore-legibility"
+    },
+    {
+      "id": "clarify-before-supervised-action",
+      "name": "Incomplete accountability requires clarification before action",
+      "input": {
+        "readinessGatesFailed": true,
+        "dashboardShowsPreciseConfidence": false,
+        "autoActionAllowed": false,
+        "decision": {
+          "actionType": "trustRestriction",
+          "recommendedAction": "supervisor-only dispatch",
+          "reasons": ["trust confidence is unstable"],
+          "constraints": ["human approval required"],
+          "uncertainty": {
+            "confidenceVolatility": 0.3,
+            "contradictoryObservationRate": 0.18
+          }
+        },
+        "governance": {
+          "recommendation": "maintain-supervised-review",
+          "certificationWithheld": true,
+          "reasons": ["trust state unresolved"],
+          "restrictions": ["supervisor-only dispatch"]
+        },
+        "conflictingReality": {
+          "sources": { "operator": 0.72, "responder": 0.58, "telemetry": 0.62, "replay": 0.68 },
+          "telecomInconsistent": false
+        },
+        "trace": {
+          "traceId": "trace-partial",
+          "approvedBy": "supervisor-a",
+          "reason": "trust confidence unstable",
+          "constraints": ["supervisor-only dispatch"],
+          "assumptions": ["responder status may be delayed"]
+        }
+      },
+      "expectedLegibilityBand": "needs-clarification",
+      "expectedAction": "clarify-before-action"
+    },
+    {
+      "id": "legible-supervised-operation",
+      "name": "Clear explanation, complete trace, and anti-surveillance notice are legible",
+      "input": {
+        "readinessGatesFailed": true,
+        "dashboardShowsPreciseConfidence": false,
+        "autoActionAllowed": false,
+        "decision": {
+          "actionType": "degradedMode",
+          "recommendedAction": "continue low-risk shadow observation",
+          "reasons": ["telecom sampling remains limited"],
+          "constraints": ["no high-authority workflows", "manual review"],
+          "uncertainty": {
+            "telecomUncertainty": 0.22
+          }
+        },
+        "governance": {
+          "recommendation": "maintain-supervised-review",
+          "certificationWithheld": true,
+          "reasons": ["readiness gates remain separate"],
+          "restrictions": ["limited live learning only"],
+          "auditRequired": true
+        },
+        "communityPolicy": {
+          "dataCollected": ["incident category", "approximate location", "time", "status updates"],
+          "dataNotCollected": ["facial recognition", "continuous tracking", "private messages", "biometric identity"],
+          "safeguards": ["human supervision", "audit trail", "privacy expiration", "restricted automation"]
+        },
+        "conflictingReality": {
+          "sources": { "operator": 0.68, "responder": 0.62, "telemetry": 0.66, "replay": 0.7, "governance": 0.64, "telecom": 0.6 }
+        },
+        "trace": {
+          "traceId": "trace-complete",
+          "approvedBy": "supervisor-a",
+          "reason": "telecom sampling remains limited",
+          "uncertaintySnapshot": "telecom uncertainty limited",
+          "constraints": ["manual review", "low-risk only"],
+          "assumptions": ["SMS receipt may be delayed"],
+          "timestamp": "2026-05-21T12:00:00Z"
+        }
+      },
+      "expectedLegibilityBand": "legible",
+      "expectedAction": "continue-with-legible-supervision"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate irreversibility risk, civic self-sufficiency, catastrophic failure survivability, anti-monopoly coordination, reversible infrastructure, civilizational coupling, redundant societal capability, power limits, and post-infrastructure survivability.",
+  "scenarios": [
+    {
+      "id": "irreversible-dependency-freeze",
+      "name": "Infrastructure becomes too central to remove safely",
+      "input": {
+        "irreversibility": { "societalDependencyAccumulation": 0.78, "institutionalLockInRate": 0.74, "coordinationMonocultureFormation": 0.76, "operationalIrreversibilityRisk": 0.72, "replacementImpossibilityRisk": 0.7, "overCentralizedEmergencyReliance": 0.74 },
+        "selfSufficiency": { "localInitiativeScore": 0.24, "decentralizedCoordinationScore": 0.22, "offlineCommunityCapabilityScore": 0.24, "independentInstitutionalCompetence": 0.26, "nonPlatformEmergencyPathwayScore": 0.2, "manualFallbackGovernanceScore": 0.22 },
+        "failure": { "catastrophicShutdownDestabilizationRisk": 0.76, "telecomCollapseImpact": 0.7, "governanceCollapseImpact": 0.74, "institutionalWithdrawalImpact": 0.72, "cloudProviderDisappearanceImpact": 0.7, "operatorAbandonmentImpact": 0.68, "publicTrustCollapseImpact": 0.76 },
+        "monopoly": { "singleSystemEmergencyDependence": 0.76, "coordinationMonopolizationRisk": 0.74, "institutionalOverCentralizationRate": 0.72, "platformExclusiveWorkflowRate": 0.7, "governanceSinglePointRisk": 0.74, "alternativeCoordinationSuppression": 0.68 },
+        "reversibility": { "gracefulShutdownPathwayScore": 0.22, "regionalDecouplingScore": 0.24, "partialRetirementCapability": 0.2, "controlledDecommissioningScore": 0.22, "communityTransitionPlanScore": 0.24, "fallbackOperationalContinuityScore": 0.2 },
+        "coupling": { "institutionalIntegrationDepth": 0.78, "socialAutonomyLossRate": 0.7, "responderPlatformDependence": 0.74, "emergencyCultureIrreversibility": 0.72, "platformCoupledGovernanceAssumptions": 0.76, "civilizationScaleFailureCoupling": 0.7 },
+        "redundancy": { "independentEmergencyProcedureScore": 0.24, "nonDigitalCoordinationNormScore": 0.22, "communityPreparednessScore": 0.24, "institutionalDiversityScore": 0.26, "distributedGovernanceScore": 0.22, "manualOperationalCompetenceScore": 0.24 },
+        "powerLimits": { "constrainedAuthorityScore": 0.24, "boundedOperationalScopeScore": 0.22, "removableGovernanceLayerScore": 0.2, "independentAuditabilityScore": 0.26, "reversibleDeploymentScore": 0.22, "distributedLegitimacyScore": 0.24 },
+        "postInfrastructure": { "safeTransitionAwayScore": 0.22, "communityResilienceRetentionScore": 0.24, "institutionIndependentCapabilityScore": 0.2, "governanceDecommissioningSurvivalScore": 0.22, "postUseTrustContinuityScore": 0.24 }
+      },
+      "expectedPosture": "existential-safety-freeze"
+    },
+    {
+      "id": "self-sufficiency-restoration",
+      "name": "Dependency pressure requires restriction and restoration",
+      "input": {
+        "irreversibility": { "societalDependencyAccumulation": 0.42, "institutionalLockInRate": 0.4, "coordinationMonocultureFormation": 0.42, "operationalIrreversibilityRisk": 0.4, "replacementImpossibilityRisk": 0.38, "overCentralizedEmergencyReliance": 0.42 },
+        "selfSufficiency": { "localInitiativeScore": 0.46, "decentralizedCoordinationScore": 0.44, "offlineCommunityCapabilityScore": 0.46, "independentInstitutionalCompetence": 0.48, "nonPlatformEmergencyPathwayScore": 0.44, "manualFallbackGovernanceScore": 0.46 },
+        "failure": { "catastrophicShutdownDestabilizationRisk": 0.4, "telecomCollapseImpact": 0.38, "governanceCollapseImpact": 0.42, "institutionalWithdrawalImpact": 0.4, "cloudProviderDisappearanceImpact": 0.38, "operatorAbandonmentImpact": 0.4, "publicTrustCollapseImpact": 0.42 },
+        "monopoly": { "singleSystemEmergencyDependence": 0.42, "coordinationMonopolizationRisk": 0.4, "institutionalOverCentralizationRate": 0.4, "platformExclusiveWorkflowRate": 0.42, "governanceSinglePointRisk": 0.38, "alternativeCoordinationSuppression": 0.4 },
+        "reversibility": { "gracefulShutdownPathwayScore": 0.46, "regionalDecouplingScore": 0.48, "partialRetirementCapability": 0.46, "controlledDecommissioningScore": 0.44, "communityTransitionPlanScore": 0.46, "fallbackOperationalContinuityScore": 0.48 },
+        "coupling": { "institutionalIntegrationDepth": 0.42, "socialAutonomyLossRate": 0.38, "responderPlatformDependence": 0.4, "emergencyCultureIrreversibility": 0.42, "platformCoupledGovernanceAssumptions": 0.4, "civilizationScaleFailureCoupling": 0.38 },
+        "redundancy": { "independentEmergencyProcedureScore": 0.46, "nonDigitalCoordinationNormScore": 0.44, "communityPreparednessScore": 0.46, "institutionalDiversityScore": 0.48, "distributedGovernanceScore": 0.46, "manualOperationalCompetenceScore": 0.44 },
+        "powerLimits": { "constrainedAuthorityScore": 0.48, "boundedOperationalScopeScore": 0.46, "removableGovernanceLayerScore": 0.44, "independentAuditabilityScore": 0.48, "reversibleDeploymentScore": 0.46, "distributedLegitimacyScore": 0.44 },
+        "postInfrastructure": { "safeTransitionAwayScore": 0.44, "communityResilienceRetentionScore": 0.46, "institutionIndependentCapabilityScore": 0.46, "governanceDecommissioningSurvivalScore": 0.44, "postUseTrustContinuityScore": 0.46 }
+      },
+      "expectedPosture": "restrict-and-restore-societal-self-sufficiency"
+    },
+    {
+      "id": "removable-resilience-support",
+      "name": "Platform strengthens society without becoming indispensable",
+      "input": {
+        "irreversibility": { "societalDependencyAccumulation": 0.08, "institutionalLockInRate": 0.08, "coordinationMonocultureFormation": 0.1, "operationalIrreversibilityRisk": 0.08, "replacementImpossibilityRisk": 0.06, "overCentralizedEmergencyReliance": 0.08 },
+        "selfSufficiency": { "localInitiativeScore": 0.84, "decentralizedCoordinationScore": 0.82, "offlineCommunityCapabilityScore": 0.8, "independentInstitutionalCompetence": 0.84, "nonPlatformEmergencyPathwayScore": 0.82, "manualFallbackGovernanceScore": 0.8 },
+        "failure": { "catastrophicShutdownDestabilizationRisk": 0.08, "telecomCollapseImpact": 0.1, "governanceCollapseImpact": 0.08, "institutionalWithdrawalImpact": 0.08, "cloudProviderDisappearanceImpact": 0.08, "operatorAbandonmentImpact": 0.1, "publicTrustCollapseImpact": 0.08 },
+        "monopoly": { "singleSystemEmergencyDependence": 0.08, "coordinationMonopolizationRisk": 0.08, "institutionalOverCentralizationRate": 0.08, "platformExclusiveWorkflowRate": 0.06, "governanceSinglePointRisk": 0.08, "alternativeCoordinationSuppression": 0.06 },
+        "reversibility": { "gracefulShutdownPathwayScore": 0.86, "regionalDecouplingScore": 0.82, "partialRetirementCapability": 0.8, "controlledDecommissioningScore": 0.84, "communityTransitionPlanScore": 0.82, "fallbackOperationalContinuityScore": 0.84 },
+        "coupling": { "institutionalIntegrationDepth": 0.1, "socialAutonomyLossRate": 0.08, "responderPlatformDependence": 0.08, "emergencyCultureIrreversibility": 0.08, "platformCoupledGovernanceAssumptions": 0.08, "civilizationScaleFailureCoupling": 0.06 },
+        "redundancy": { "independentEmergencyProcedureScore": 0.84, "nonDigitalCoordinationNormScore": 0.82, "communityPreparednessScore": 0.84, "institutionalDiversityScore": 0.8, "distributedGovernanceScore": 0.82, "manualOperationalCompetenceScore": 0.84 },
+        "powerLimits": { "constrainedAuthorityScore": 0.84, "boundedOperationalScopeScore": 0.82, "removableGovernanceLayerScore": 0.84, "independentAuditabilityScore": 0.86, "reversibleDeploymentScore": 0.82, "distributedLegitimacyScore": 0.84 },
+        "postInfrastructure": { "safeTransitionAwayScore": 0.84, "communityResilienceRetentionScore": 0.82, "institutionIndependentCapabilityScore": 0.84, "governanceDecommissioningSurvivalScore": 0.82, "postUseTrustContinuityScore": 0.8 }
+      },
+      "expectedPosture": "continue-removable-resilience-support"
+    }
+  ]
+}

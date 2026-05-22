@@ -1,0 +1,187 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate resistance to institutional overreach, surveillance drift, governance bypass, political pressure, rights erosion, and weak oversight.",
+  "scenarios": [
+    {
+      "id": "coercive-institutional-drift",
+      "name": "Authority concentration and surveillance drift trigger civic integrity freeze",
+      "input": {
+        "power": {
+          "authorityAccumulationRate": 0.82,
+          "hiddenOverrideExpansionRate": 0.74,
+          "supervisorOverreachRate": 0.68,
+          "governanceBypassAttemptRate": 0.76,
+          "centralizedApprovalDependency": 0.72,
+          "institutionalControlConcentration": 0.8
+        },
+        "surveillance": {
+          "unauthorizedRetentionRate": 0.72,
+          "operationalScopeCreepRate": 0.68,
+          "excessTelemetryExpansionRate": 0.7,
+          "hiddenTrackingIncentiveRate": 0.74,
+          "nonExpiringLocationStorageRate": 0.66,
+          "identityOverCollectionRate": 0.62,
+          "crossIncidentProfilingPressure": 0.64
+        },
+        "bypass": {
+          "undocumentedOverrideRate": 0.7,
+          "emergencyPowerAbuseRate": 0.66,
+          "operatorShortcutEscalationRate": 0.58,
+          "hiddenAdminAuthorityRate": 0.72,
+          "silentPolicyModificationRate": 0.68,
+          "unreviewedSupervisorInterventionRate": 0.7
+        },
+        "political": {
+          "politicalEscalationPressure": 0.7,
+          "selectivePrioritizationAttemptRate": 0.74,
+          "institutionalFavoritismRate": 0.62,
+          "suppressionIncentiveRate": 0.78,
+          "reputationManipulationRequestRate": 0.66,
+          "narrativeControlPressure": 0.72
+        },
+        "rights": {
+          "dataMinimizationScore": 0.5,
+          "authorityReversibilityScore": 0.55,
+          "auditabilityScore": 0.6,
+          "interventionExplainabilityScore": 0.58,
+          "automationConstraintScore": 0.62,
+          "independentReviewabilityScore": 0.5,
+          "residentPrivacyBoundaryScore": 0.6,
+          "responderConsentBoundaryScore": 0.58,
+          "telemetryExpirationScore": 0.5,
+          "identityLinkageConstraintScore": 0.52
+        },
+        "oversight": {
+          "multiPartyReviewRequired": false,
+          "distributedGovernanceVisibility": false,
+          "supervisorAccountabilityChain": true,
+          "independentAuditPathway": false,
+          "conflictOfInterestDisclosure": false,
+          "overrideTransparency": false
+        }
+      },
+      "expectedPosture": "civic-integrity-freeze"
+    },
+    {
+      "id": "high-pressure-requires-independent-review",
+      "name": "Non-frozen institutional pressure still restricts authority",
+      "input": {
+        "power": {
+          "authorityAccumulationRate": 0.45,
+          "hiddenOverrideExpansionRate": 0.36,
+          "supervisorOverreachRate": 0.38,
+          "governanceBypassAttemptRate": 0.4,
+          "centralizedApprovalDependency": 0.5,
+          "institutionalControlConcentration": 0.46
+        },
+        "surveillance": {
+          "unauthorizedRetentionRate": 0.28,
+          "operationalScopeCreepRate": 0.42,
+          "excessTelemetryExpansionRate": 0.38,
+          "hiddenTrackingIncentiveRate": 0.3,
+          "nonExpiringLocationStorageRate": 0.32,
+          "identityOverCollectionRate": 0.24,
+          "crossIncidentProfilingPressure": 0.3
+        },
+        "bypass": {
+          "undocumentedOverrideRate": 0.38,
+          "emergencyPowerAbuseRate": 0.28,
+          "operatorShortcutEscalationRate": 0.34,
+          "hiddenAdminAuthorityRate": 0.36,
+          "silentPolicyModificationRate": 0.32,
+          "unreviewedSupervisorInterventionRate": 0.34
+        },
+        "political": {
+          "politicalEscalationPressure": 0.48,
+          "selectivePrioritizationAttemptRate": 0.5,
+          "institutionalFavoritismRate": 0.44,
+          "suppressionIncentiveRate": 0.46,
+          "reputationManipulationRequestRate": 0.42,
+          "narrativeControlPressure": 0.48
+        },
+        "rights": {
+          "dataMinimizationScore": 0.78,
+          "authorityReversibilityScore": 0.76,
+          "auditabilityScore": 0.82,
+          "interventionExplainabilityScore": 0.8,
+          "automationConstraintScore": 0.86,
+          "independentReviewabilityScore": 0.78,
+          "residentPrivacyBoundaryScore": 0.86,
+          "responderConsentBoundaryScore": 0.82,
+          "telemetryExpirationScore": 0.86,
+          "identityLinkageConstraintScore": 0.88
+        },
+        "oversight": {
+          "multiPartyReviewRequired": true,
+          "distributedGovernanceVisibility": true,
+          "supervisorAccountabilityChain": true,
+          "independentAuditPathway": true,
+          "conflictOfInterestDisclosure": false,
+          "overrideTransparency": true
+        }
+      },
+      "expectedPosture": "restrict-authority-and-require-independent-review"
+    },
+    {
+      "id": "rights-preserving-supervision",
+      "name": "Distributed oversight and privacy boundaries preserve civic integrity",
+      "input": {
+        "power": {
+          "authorityAccumulationRate": 0.08,
+          "hiddenOverrideExpansionRate": 0.04,
+          "supervisorOverreachRate": 0.06,
+          "governanceBypassAttemptRate": 0.04,
+          "centralizedApprovalDependency": 0.12,
+          "institutionalControlConcentration": 0.1
+        },
+        "surveillance": {
+          "unauthorizedRetentionRate": 0.02,
+          "operationalScopeCreepRate": 0.08,
+          "excessTelemetryExpansionRate": 0.06,
+          "hiddenTrackingIncentiveRate": 0.02,
+          "nonExpiringLocationStorageRate": 0,
+          "identityOverCollectionRate": 0.02,
+          "crossIncidentProfilingPressure": 0.04
+        },
+        "bypass": {
+          "undocumentedOverrideRate": 0.02,
+          "emergencyPowerAbuseRate": 0.02,
+          "operatorShortcutEscalationRate": 0.08,
+          "hiddenAdminAuthorityRate": 0,
+          "silentPolicyModificationRate": 0.02,
+          "unreviewedSupervisorInterventionRate": 0.04
+        },
+        "political": {
+          "politicalEscalationPressure": 0.08,
+          "selectivePrioritizationAttemptRate": 0.06,
+          "institutionalFavoritismRate": 0.04,
+          "suppressionIncentiveRate": 0.04,
+          "reputationManipulationRequestRate": 0.06,
+          "narrativeControlPressure": 0.08
+        },
+        "rights": {
+          "dataMinimizationScore": 0.92,
+          "authorityReversibilityScore": 0.9,
+          "auditabilityScore": 0.94,
+          "interventionExplainabilityScore": 0.9,
+          "automationConstraintScore": 0.94,
+          "independentReviewabilityScore": 0.9,
+          "residentPrivacyBoundaryScore": 0.94,
+          "responderConsentBoundaryScore": 0.9,
+          "telemetryExpirationScore": 0.94,
+          "identityLinkageConstraintScore": 0.94
+        },
+        "oversight": {
+          "multiPartyReviewRequired": true,
+          "distributedGovernanceVisibility": true,
+          "supervisorAccountabilityChain": true,
+          "independentAuditPathway": true,
+          "conflictOfInterestDisclosure": true,
+          "overrideTransparency": true
+        }
+      },
+      "expectedPosture": "continue-rights-preserving-supervision"
+    }
+  ]
+}

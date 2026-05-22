@@ -1,0 +1,176 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate longitudinal operational reality accumulation, model divergence, chronic instability fingerprints, and false-normalization detection.",
+  "scenarios": [
+    {
+      "id": "model-invalid-under-chronic-instability",
+      "name": "Repeated field reality invalidates operational assumptions",
+      "input": {
+        "records": [
+          {
+            "date": "2026-05-01",
+            "regionId": "yaba-west",
+            "telecomProvider": "mtn",
+            "institutionId": "clinic-a",
+            "telecomState": "degraded",
+            "delayedReceiptAnomaly": true,
+            "responderAbandonmentRate": 0.18,
+            "operatorFatigueScore": 0.44,
+            "escalationInconsistencyRate": 0.24,
+            "degradedModeHours": 6,
+            "syncDriftEvents": 5,
+            "trustVolatilityRate": 0.38,
+            "governanceReviewMissed": true,
+            "institutionNonResponse": true,
+            "institutionHandoffFailures": 2
+          },
+          {
+            "date": "2026-05-02",
+            "regionId": "yaba-west",
+            "telecomProvider": "mtn",
+            "institutionId": "clinic-a",
+            "telecomState": "collapsed",
+            "delayedReceiptAnomaly": true,
+            "responderAbandonmentRate": 0.24,
+            "operatorFatigueScore": 0.58,
+            "escalationInconsistencyRate": 0.32,
+            "degradedModeHours": 8,
+            "syncDriftEvents": 6,
+            "trustVolatilityRate": 0.48,
+            "governanceReviewMissed": true,
+            "institutionNonResponse": true,
+            "institutionHandoffFailures": 3
+          }
+        ],
+        "expected": {
+          "p95SmsLatencySeconds": 120,
+          "responderReliability": 0.92,
+          "operatorOverloadRate": 0.12,
+          "telecomReliability": 0.9,
+          "governanceReviewCompletionRate": 0.95,
+          "trustStability": 0.9,
+          "recoverySuccessRate": 0.9
+        },
+        "observed": {
+          "p95SmsLatencySeconds": 540,
+          "responderReliability": 0.44,
+          "operatorOverloadRate": 0.66,
+          "telecomReliability": 0.34,
+          "governanceReviewCompletionRate": 0.55,
+          "trustStability": 0.46,
+          "recoverySuccessRate": 0.5
+        },
+        "narrative": {
+          "reportedOperationalStatus": "normal",
+          "governanceConfidence": 0.82,
+          "trustNarrative": "stable",
+          "telecomConfidence": 0.82,
+          "staffingNarrative": "healthy"
+        }
+      },
+      "expectedPosture": "freeze-assumption-driven-operations"
+    },
+    {
+      "id": "material-drift-requires-restricted-learning",
+      "name": "Material drift keeps operation in restricted learning mode",
+      "input": {
+        "records": [
+          {
+            "date": "2026-05-08",
+            "regionId": "yaba-east",
+            "telecomProvider": "glo",
+            "institutionId": "clinic-b",
+            "telecomState": "degraded",
+            "delayedReceiptAnomaly": true,
+            "responderAbandonmentRate": 0.12,
+            "operatorFatigueScore": 0.32,
+            "escalationInconsistencyRate": 0.16,
+            "degradedModeHours": 7,
+            "syncDriftEvents": 2,
+            "trustVolatilityRate": 0.24,
+            "governanceReviewMissed": true
+          },
+          {
+            "date": "2026-05-09",
+            "regionId": "yaba-east",
+            "telecomProvider": "glo",
+            "institutionId": "clinic-b",
+            "telecomState": "normal",
+            "responderAbandonmentRate": 0.1,
+            "operatorFatigueScore": 0.28,
+            "escalationInconsistencyRate": 0.14,
+            "degradedModeHours": 6,
+            "syncDriftEvents": 1,
+            "trustVolatilityRate": 0.22,
+            "governanceReviewMissed": true
+          }
+        ],
+        "expected": {
+          "p95SmsLatencySeconds": 150,
+          "responderReliability": 0.88,
+          "operatorOverloadRate": 0.16,
+          "telecomReliability": 0.86,
+          "governanceReviewCompletionRate": 0.9,
+          "trustStability": 0.86,
+          "recoverySuccessRate": 0.86
+        },
+        "observed": {
+          "p95SmsLatencySeconds": 430,
+          "responderReliability": 0.56,
+          "operatorOverloadRate": 0.52,
+          "telecomReliability": 0.5,
+          "governanceReviewCompletionRate": 0.62,
+          "trustStability": 0.7,
+          "recoverySuccessRate": 0.72
+        },
+        "narrative": {
+          "reportedOperationalStatus": "normal",
+          "governanceConfidence": 0.8,
+          "telecomConfidence": 0.78
+        }
+      },
+      "expectedPosture": "restricted-reality-learning"
+    },
+    {
+      "id": "controlled-observation-continues",
+      "name": "Low drift and clear narrative allow continued observation",
+      "input": {
+        "records": [
+          {
+            "date": "2026-05-15",
+            "regionId": "yaba-central",
+            "telecomProvider": "airtel",
+            "institutionId": "clinic-c",
+            "telecomState": "normal",
+            "responderAbandonmentRate": 0.04,
+            "operatorFatigueScore": 0.12,
+            "escalationInconsistencyRate": 0.06,
+            "degradedModeHours": 0,
+            "syncDriftEvents": 0,
+            "trustVolatilityRate": 0.08
+          }
+        ],
+        "expected": {
+          "p95SmsLatencySeconds": 170,
+          "responderReliability": 0.84,
+          "operatorOverloadRate": 0.18,
+          "telecomReliability": 0.82,
+          "governanceReviewCompletionRate": 0.88,
+          "trustStability": 0.84,
+          "recoverySuccessRate": 0.84
+        },
+        "observed": {
+          "p95SmsLatencySeconds": 190,
+          "responderReliability": 0.82,
+          "operatorOverloadRate": 0.2,
+          "telecomReliability": 0.8,
+          "governanceReviewCompletionRate": 0.86,
+          "trustStability": 0.82,
+          "recoverySuccessRate": 0.82
+        }
+      },
+      "expectedPosture": "continue-controlled-observation"
+    }
+  ]
+}

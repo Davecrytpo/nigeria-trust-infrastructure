@@ -1,0 +1,151 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate emergency coordination survivability under Nigerian field conditions.",
+  "acceptanceMetrics": {
+    "maxAcknowledgmentLatencyMs": 180000,
+    "minOfflineRecoveryRate": 0.95,
+    "maxDuplicateIncidentRate": 0.03,
+    "minCriticalEventRetentionRate": 1,
+    "maxOperatorAmbiguityCount": 0
+  },
+  "scenarios": [
+    {
+      "id": "weak-mtn-glo-panic-alert",
+      "name": "Weak MTN/Glo panic alert",
+      "category": "telecom_instability",
+      "incidentCount": 1,
+      "responderCount": 6,
+      "operatorCount": 1,
+      "conditions": {
+        "networkDropRate": 0.42,
+        "smsDelayMs": 90000,
+        "gpsDriftMeters": 120,
+        "backgroundTerminationRate": 0.2,
+        "batteryLevelPercent": 18,
+        "queueDurability": true,
+        "operationalControls": {
+          "encryptedWalQueue": true,
+          "idempotentOfflineReplay": true,
+          "syncCheckpointing": true,
+          "smsProviderFailover": true,
+          "receiptReconciliation": true,
+          "edgeRetryRouting": true,
+          "backgroundSosRecovery": true,
+          "appKillRecovery": true,
+          "duplicateSuppression": true
+        }
+      },
+      "expected": {
+        "acknowledged": true,
+        "operatorEscalation": false,
+        "offlineRecovery": true,
+        "criticalEventsRetained": true
+      }
+    },
+    {
+      "id": "delayed-sms-app-fallback",
+      "name": "Delayed SMS with app fallback",
+      "category": "partial_connectivity",
+      "incidentCount": 2,
+      "responderCount": 8,
+      "operatorCount": 1,
+      "conditions": {
+        "networkDropRate": 0.25,
+        "smsDelayMs": 210000,
+        "gpsDriftMeters": 80,
+        "backgroundTerminationRate": 0.1,
+        "batteryLevelPercent": 34,
+        "queueDurability": true,
+        "operationalControls": {
+          "encryptedWalQueue": true,
+          "idempotentOfflineReplay": true,
+          "syncCheckpointing": true,
+          "smsProviderFailover": true,
+          "receiptReconciliation": true,
+          "edgeRetryRouting": true,
+          "backgroundSosRecovery": true,
+          "appKillRecovery": true,
+          "duplicateSuppression": true
+        }
+      },
+      "expected": {
+        "acknowledged": true,
+        "operatorEscalation": true,
+        "offlineRecovery": true,
+        "criticalEventsRetained": true
+      }
+    },
+    {
+      "id": "android-background-kill-low-battery",
+      "name": "Android background termination under low battery",
+      "category": "device_restriction",
+      "incidentCount": 1,
+      "responderCount": 5,
+      "operatorCount": 1,
+      "conditions": {
+        "networkDropRate": 0.15,
+        "smsDelayMs": 45000,
+        "gpsDriftMeters": 60,
+        "backgroundTerminationRate": 0.65,
+        "batteryLevelPercent": 7,
+        "queueDurability": true,
+        "operationalControls": {
+          "encryptedWalQueue": true,
+          "idempotentOfflineReplay": true,
+          "syncCheckpointing": true,
+          "backgroundSosRecovery": true,
+          "appKillRecovery": true,
+          "lowBatterySosMode": true,
+          "duplicateSuppression": true
+        }
+      },
+      "expected": {
+        "acknowledged": true,
+        "operatorEscalation": true,
+        "offlineRecovery": true,
+        "criticalEventsRetained": true
+      }
+    },
+    {
+      "id": "multi-incident-market-surge",
+      "name": "Multi-incident market surge",
+      "category": "disaster_mode",
+      "incidentCount": 18,
+      "responderCount": 24,
+      "operatorCount": 3,
+      "conditions": {
+        "networkDropRate": 0.35,
+        "smsDelayMs": 120000,
+        "gpsDriftMeters": 200,
+        "backgroundTerminationRate": 0.3,
+        "batteryLevelPercent": 22,
+        "queueDurability": true,
+        "operationalControls": {
+          "encryptedWalQueue": true,
+          "idempotentOfflineReplay": true,
+          "syncCheckpointing": true,
+          "smsProviderFailover": true,
+          "receiptReconciliation": true,
+          "edgeRetryRouting": true,
+          "backgroundSosRecovery": true,
+          "appKillRecovery": true,
+          "gpsDriftCompensation": true,
+          "adaptivePriorityQueue": true,
+          "operatorSurgeRouting": true,
+          "operatorQueuePartitioning": true,
+          "responderLoadBalancing": true,
+          "regionalIncidentClustering": true,
+          "scarcityDispatchMode": true,
+          "duplicateSuppression": true
+        }
+      },
+      "expected": {
+        "acknowledged": true,
+        "operatorEscalation": true,
+        "offlineRecovery": true,
+        "criticalEventsRetained": true
+      }
+    }
+  ]
+}

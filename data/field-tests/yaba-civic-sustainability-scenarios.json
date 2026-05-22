@@ -1,0 +1,55 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate long-horizon civic sustainability, economic survivability, fatigue accumulation, trust evolution, dependency fragility, governance renewal, infrastructure minimalism, cultural adaptation, and recovery sustainability.",
+  "scenarios": [
+    {
+      "id": "unsustainable-civic-burden",
+      "name": "Maintenance, funding, trust, and dependency collapse freeze operation",
+      "input": {
+        "longHorizon": { "maintenanceContinuityScore": 0.32, "organizationalSuccessionReadiness": 0.28, "staffingDurabilityScore": 0.34, "infrastructureAgingRisk": 0.74, "operationalDecayRate": 0.68, "documentationContinuityScore": 0.4 },
+        "economic": { "telecomCostGrowthRate": 0.72, "smsCostExpansionRate": 0.76, "infrastructureCostGrowthRate": 0.62, "responderSupportBurdenRate": 0.58, "institutionalFundingVolatility": 0.7, "civicDependencyBurdenRate": 0.66, "maintenanceAffordabilityScore": 0.32 },
+        "fatigue": { "chronicOperationalExhaustionRate": 0.68, "governanceReviewFatigueRate": 0.74, "institutionalComplacencyRate": 0.62, "oversightDegradationRate": 0.7, "humanShortcutNormalizationRate": 0.66, "proceduralAbandonmentRate": 0.58 },
+        "trust": { "trustAccumulationScore": 0.22, "trustErosionRate": 0.7, "expectationInflationRate": 0.66, "disappointmentMemoryRate": 0.72, "rumorPropagationRate": 0.64, "perceivedBiasRate": 0.68, "fearAmplificationRate": 0.58, "civicLegitimacyDriftRate": 0.62 },
+        "dependency": { "telecomProviderDependencyRate": 0.82, "cloudProviderDependencyRate": 0.68, "institutionalPartnershipFragility": 0.74, "smsGatewayConcentrationRisk": 0.8, "regionalInfrastructureAsymmetry": 0.7, "operatorTurnoverRisk": 0.64 },
+        "governance": { "renewableOversightScore": 0.34, "governanceSuccessionContinuity": 0.28, "rotatingAccountabilityScore": 0.32, "institutionalMemoryPreservation": 0.36, "auditContinuityScore": 0.3, "distributedReviewDurability": 0.34 },
+        "minimalism": { "operationalComplexityScore": 0.72, "unnecessaryFeatureGrowthRate": 0.68, "maintenanceBurdenAccumulation": 0.74, "governanceSurfaceExpansionRate": 0.66, "hiddenOperationalDebtRate": 0.7 },
+        "cultural": { "regionalAdoptionVariance": 0.7, "localTrustBehaviorVariance": 0.66, "civicParticipationVariance": 0.62, "informalCoordinationMismatchRate": 0.72, "languageInterpretationGapRate": 0.68, "adaptationIntegrityLossRisk": 0.74 },
+        "recovery": { "repeatedCrisisRecoveryFatigue": 0.72, "degradedStateNormalizationRate": 0.68, "longTermRollbackExhaustionRate": 0.64, "chronicInstabilityAdaptationRate": 0.7, "institutionalRecoveryExhaustion": 0.74 }
+      },
+      "expectedPosture": "sustainability-freeze"
+    },
+    {
+      "id": "fragile-but-rebuildable",
+      "name": "Rising cost, fatigue, and dependency risk require sustainability rebuild",
+      "input": {
+        "longHorizon": { "maintenanceContinuityScore": 0.58, "organizationalSuccessionReadiness": 0.56, "staffingDurabilityScore": 0.6, "infrastructureAgingRisk": 0.42, "operationalDecayRate": 0.44, "documentationContinuityScore": 0.62 },
+        "economic": { "telecomCostGrowthRate": 0.48, "smsCostExpansionRate": 0.5, "infrastructureCostGrowthRate": 0.42, "responderSupportBurdenRate": 0.4, "institutionalFundingVolatility": 0.48, "civicDependencyBurdenRate": 0.42, "maintenanceAffordabilityScore": 0.58 },
+        "fatigue": { "chronicOperationalExhaustionRate": 0.46, "governanceReviewFatigueRate": 0.48, "institutionalComplacencyRate": 0.38, "oversightDegradationRate": 0.44, "humanShortcutNormalizationRate": 0.42, "proceduralAbandonmentRate": 0.36 },
+        "trust": { "trustAccumulationScore": 0.54, "trustErosionRate": 0.42, "expectationInflationRate": 0.4, "disappointmentMemoryRate": 0.46, "rumorPropagationRate": 0.38, "perceivedBiasRate": 0.42, "fearAmplificationRate": 0.34, "civicLegitimacyDriftRate": 0.36 },
+        "dependency": { "telecomProviderDependencyRate": 0.5, "cloudProviderDependencyRate": 0.42, "institutionalPartnershipFragility": 0.48, "smsGatewayConcentrationRisk": 0.52, "regionalInfrastructureAsymmetry": 0.46, "operatorTurnoverRisk": 0.44 },
+        "governance": { "renewableOversightScore": 0.58, "governanceSuccessionContinuity": 0.56, "rotatingAccountabilityScore": 0.6, "institutionalMemoryPreservation": 0.58, "auditContinuityScore": 0.6, "distributedReviewDurability": 0.58 },
+        "minimalism": { "operationalComplexityScore": 0.5, "unnecessaryFeatureGrowthRate": 0.42, "maintenanceBurdenAccumulation": 0.5, "governanceSurfaceExpansionRate": 0.44, "hiddenOperationalDebtRate": 0.48 },
+        "cultural": { "regionalAdoptionVariance": 0.42, "localTrustBehaviorVariance": 0.4, "civicParticipationVariance": 0.38, "informalCoordinationMismatchRate": 0.44, "languageInterpretationGapRate": 0.42, "adaptationIntegrityLossRisk": 0.36 },
+        "recovery": { "repeatedCrisisRecoveryFatigue": 0.48, "degradedStateNormalizationRate": 0.42, "longTermRollbackExhaustionRate": 0.4, "chronicInstabilityAdaptationRate": 0.44, "institutionalRecoveryExhaustion": 0.46 }
+      },
+      "expectedPosture": "restrict-and-rebuild-sustainability"
+    },
+    {
+      "id": "sustainable-limited-operation",
+      "name": "Constrained low-complexity operation remains sustainable",
+      "input": {
+        "longHorizon": { "maintenanceContinuityScore": 0.84, "organizationalSuccessionReadiness": 0.82, "staffingDurabilityScore": 0.84, "infrastructureAgingRisk": 0.12, "operationalDecayRate": 0.1, "documentationContinuityScore": 0.86 },
+        "economic": { "telecomCostGrowthRate": 0.12, "smsCostExpansionRate": 0.1, "infrastructureCostGrowthRate": 0.14, "responderSupportBurdenRate": 0.12, "institutionalFundingVolatility": 0.16, "civicDependencyBurdenRate": 0.1, "maintenanceAffordabilityScore": 0.86 },
+        "fatigue": { "chronicOperationalExhaustionRate": 0.12, "governanceReviewFatigueRate": 0.14, "institutionalComplacencyRate": 0.08, "oversightDegradationRate": 0.1, "humanShortcutNormalizationRate": 0.08, "proceduralAbandonmentRate": 0.06 },
+        "trust": { "trustAccumulationScore": 0.82, "trustErosionRate": 0.1, "expectationInflationRate": 0.12, "disappointmentMemoryRate": 0.1, "rumorPropagationRate": 0.08, "perceivedBiasRate": 0.08, "fearAmplificationRate": 0.06, "civicLegitimacyDriftRate": 0.08 },
+        "dependency": { "telecomProviderDependencyRate": 0.18, "cloudProviderDependencyRate": 0.2, "institutionalPartnershipFragility": 0.16, "smsGatewayConcentrationRisk": 0.18, "regionalInfrastructureAsymmetry": 0.18, "operatorTurnoverRisk": 0.14 },
+        "governance": { "renewableOversightScore": 0.86, "governanceSuccessionContinuity": 0.84, "rotatingAccountabilityScore": 0.84, "institutionalMemoryPreservation": 0.86, "auditContinuityScore": 0.86, "distributedReviewDurability": 0.84 },
+        "minimalism": { "operationalComplexityScore": 0.16, "unnecessaryFeatureGrowthRate": 0.08, "maintenanceBurdenAccumulation": 0.14, "governanceSurfaceExpansionRate": 0.12, "hiddenOperationalDebtRate": 0.1 },
+        "cultural": { "regionalAdoptionVariance": 0.16, "localTrustBehaviorVariance": 0.14, "civicParticipationVariance": 0.14, "informalCoordinationMismatchRate": 0.16, "languageInterpretationGapRate": 0.14, "adaptationIntegrityLossRisk": 0.08 },
+        "recovery": { "repeatedCrisisRecoveryFatigue": 0.14, "degradedStateNormalizationRate": 0.1, "longTermRollbackExhaustionRate": 0.1, "chronicInstabilityAdaptationRate": 0.12, "institutionalRecoveryExhaustion": 0.12 }
+      },
+      "expectedPosture": "continue-sustainable-limited-operation"
+    }
+  ]
+}

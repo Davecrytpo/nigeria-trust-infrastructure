@@ -1,0 +1,52 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate mission drift detection, adaptive legitimacy, technology restraint, complexity control, principle preservation, societal alignment, evolutionary oversight, and anti-permanent-emergency protections.",
+  "scenarios": [
+    {
+      "id": "identity-and-principle-failure",
+      "name": "Mission drift, technology overreach, and emergency normalization freeze evolution",
+      "input": {
+        "mission": { "purposeExpansionRate": 0.72, "silentFeatureCreepRate": 0.66, "authorityScopeGrowthRate": 0.76, "governanceDilutionRate": 0.7, "operationalOverreachRate": 0.68, "infrastructureIdentityErosionRate": 0.74 },
+        "legitimacy": { "publicExpectationShiftRate": 0.7, "civicNormShiftRate": 0.66, "institutionalTrustShiftRate": 0.72, "generationalPerceptionGapRate": 0.64, "regionalLegitimacyVariance": 0.7, "longTermReputationVolatility": 0.74 },
+        "technology": { "aiOverAutomationPressure": 0.72, "predictiveGovernanceIncentive": 0.74, "excessTelemetryDependence": 0.64, "biometricExpansionPressure": 0.76, "automatedAuthorityEscalationRate": 0.7, "optimizationDrivenSurveillanceDrift": 0.68 },
+        "complexity": { "governanceSurfaceExpansionRate": 0.72, "operationalDependencyGrowthRate": 0.7, "maintenanceBurdenInflationRate": 0.74, "institutionalCoordinationOverloadRate": 0.66, "hiddenArchitecturalFragilityRate": 0.76 },
+        "principles": { "minimumNecessaryAuthorityScore": 0.62, "reversibleDeploymentScore": 0.58, "uncertaintyVisibilityScore": 0.6, "humanAccountabilityScore": 0.64, "operationalRestraintScore": 0.56, "privacyBoundaryScore": 0.6, "explainableGovernanceScore": 0.62 },
+        "alignment": { "communityPerceivedValueScore": 0.32, "livedRealityFitScore": 0.3, "governanceUnderstandabilityScore": 0.34, "operatorTrustScore": 0.38, "institutionalParticipationHealth": 0.36 },
+        "oversight": { "periodicLegitimacyReview": false, "externalCivicReviewPathway": false, "governanceRenewalCheckpoint": false, "institutionalDriftAudit": false, "principleComplianceReview": true, "infrastructureSimplificationReview": false },
+        "emergency": { "exceptionalPowerNormalizationRate": 0.72, "endlessDegradedGovernanceRate": 0.68, "perpetualEmergencyAuthorityRate": 0.76, "escalationHabituationRate": 0.66, "chronicOperatorOverrideCultureRate": 0.7 }
+      },
+      "expectedPosture": "adaptive-legitimacy-freeze"
+    },
+    {
+      "id": "legitimacy-fragile-requires-renewal",
+      "name": "Drift pressure requires legitimacy renewal before evolution",
+      "input": {
+        "mission": { "purposeExpansionRate": 0.34, "silentFeatureCreepRate": 0.32, "authorityScopeGrowthRate": 0.36, "governanceDilutionRate": 0.34, "operationalOverreachRate": 0.3, "infrastructureIdentityErosionRate": 0.32 },
+        "legitimacy": { "publicExpectationShiftRate": 0.46, "civicNormShiftRate": 0.42, "institutionalTrustShiftRate": 0.48, "generationalPerceptionGapRate": 0.44, "regionalLegitimacyVariance": 0.46, "longTermReputationVolatility": 0.48 },
+        "technology": { "aiOverAutomationPressure": 0.36, "predictiveGovernanceIncentive": 0.34, "excessTelemetryDependence": 0.38, "biometricExpansionPressure": 0.3, "automatedAuthorityEscalationRate": 0.32, "optimizationDrivenSurveillanceDrift": 0.34 },
+        "complexity": { "governanceSurfaceExpansionRate": 0.42, "operationalDependencyGrowthRate": 0.4, "maintenanceBurdenInflationRate": 0.44, "institutionalCoordinationOverloadRate": 0.38, "hiddenArchitecturalFragilityRate": 0.42 },
+        "principles": { "minimumNecessaryAuthorityScore": 0.82, "reversibleDeploymentScore": 0.84, "uncertaintyVisibilityScore": 0.88, "humanAccountabilityScore": 0.88, "operationalRestraintScore": 0.82, "privacyBoundaryScore": 0.88, "explainableGovernanceScore": 0.88 },
+        "alignment": { "communityPerceivedValueScore": 0.58, "livedRealityFitScore": 0.56, "governanceUnderstandabilityScore": 0.6, "operatorTrustScore": 0.62, "institutionalParticipationHealth": 0.58 },
+        "oversight": { "periodicLegitimacyReview": true, "externalCivicReviewPathway": false, "governanceRenewalCheckpoint": true, "institutionalDriftAudit": true, "principleComplianceReview": true, "infrastructureSimplificationReview": false },
+        "emergency": { "exceptionalPowerNormalizationRate": 0.32, "endlessDegradedGovernanceRate": 0.28, "perpetualEmergencyAuthorityRate": 0.3, "escalationHabituationRate": 0.34, "chronicOperatorOverrideCultureRate": 0.28 }
+      },
+      "expectedPosture": "restrict-evolution-and-renew-legitimacy"
+    },
+    {
+      "id": "principled-evolution-continues",
+      "name": "Governed restrained evolution remains aligned",
+      "input": {
+        "mission": { "purposeExpansionRate": 0.08, "silentFeatureCreepRate": 0.06, "authorityScopeGrowthRate": 0.08, "governanceDilutionRate": 0.06, "operationalOverreachRate": 0.06, "infrastructureIdentityErosionRate": 0.04 },
+        "legitimacy": { "publicExpectationShiftRate": 0.12, "civicNormShiftRate": 0.1, "institutionalTrustShiftRate": 0.12, "generationalPerceptionGapRate": 0.14, "regionalLegitimacyVariance": 0.12, "longTermReputationVolatility": 0.1 },
+        "technology": { "aiOverAutomationPressure": 0.06, "predictiveGovernanceIncentive": 0.04, "excessTelemetryDependence": 0.08, "biometricExpansionPressure": 0, "automatedAuthorityEscalationRate": 0.04, "optimizationDrivenSurveillanceDrift": 0.04 },
+        "complexity": { "governanceSurfaceExpansionRate": 0.1, "operationalDependencyGrowthRate": 0.08, "maintenanceBurdenInflationRate": 0.1, "institutionalCoordinationOverloadRate": 0.08, "hiddenArchitecturalFragilityRate": 0.08 },
+        "principles": { "minimumNecessaryAuthorityScore": 0.92, "reversibleDeploymentScore": 0.9, "uncertaintyVisibilityScore": 0.94, "humanAccountabilityScore": 0.92, "operationalRestraintScore": 0.94, "privacyBoundaryScore": 0.94, "explainableGovernanceScore": 0.92 },
+        "alignment": { "communityPerceivedValueScore": 0.84, "livedRealityFitScore": 0.82, "governanceUnderstandabilityScore": 0.86, "operatorTrustScore": 0.84, "institutionalParticipationHealth": 0.82 },
+        "oversight": { "periodicLegitimacyReview": true, "externalCivicReviewPathway": true, "governanceRenewalCheckpoint": true, "institutionalDriftAudit": true, "principleComplianceReview": true, "infrastructureSimplificationReview": true },
+        "emergency": { "exceptionalPowerNormalizationRate": 0.06, "endlessDegradedGovernanceRate": 0.04, "perpetualEmergencyAuthorityRate": 0.04, "escalationHabituationRate": 0.06, "chronicOperatorOverrideCultureRate": 0.04 }
+      },
+      "expectedPosture": "continue-principled-evolution"
+    }
+  ]
+}

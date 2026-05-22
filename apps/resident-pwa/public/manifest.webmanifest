@@ -1,0 +1,16 @@
+{
+  "name": "Yaba Emergency Pilot",
+  "short_name": "Yaba Pilot",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f2e8",
+  "theme_color": "#b42318",
+  "icons": [
+    {
+      "src": "/resident/public/pilot-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

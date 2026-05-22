@@ -1,0 +1,147 @@
+{
+  "generatedAt": "2026-05-22T17:25:01.022Z",
+  "evidenceDir": "reports",
+  "files": [
+    {
+      "path": "reports\\mobile\\device-validation-2026-05-21T23-48-27-802Z.json",
+      "sha256": "8ee551c159cb04b53372619bc31e8910f1922df2b0ac3198a71d0ee6719c9032"
+    },
+    {
+      "path": "reports\\mobile\\flutter-validation-2026-05-22T16-27-42Z\\commands.ndjson",
+      "sha256": "14e0be9a1da710117b354fb9a04e93ee0a6cda7ca3f2387da84946568aded30e"
+    },
+    {
+      "path": "reports\\mobile\\flutter-validation-2026-05-22T16-38-58Z\\commands.ndjson",
+      "sha256": "956d62f4fcddd6568c56bb3ea066779d0e1c89a2cec752d2e1d2b4f2357c782a"
+    },
+    {
+      "path": "reports\\mobile\\flutter-validation-2026-05-22T17-22-22Z\\commands.ndjson",
+      "sha256": "bbbc5ef0f9677e93b40fd3ec9ff3b7770f5d5eed57f9e120cd892e0f258953fd"
+    },
+    {
+      "path": "reports\\mobile\\latest-flutter-validation-dir.txt",
+      "sha256": "7191c61b18b5b84f6e36dbbff99628c6266cff75c0a56940078e285fd79672b1"
+    },
+    {
+      "path": "reports\\readiness\\operational-readiness-dossier-2026-05-22T00-04-09-181Z.json",
+      "sha256": "3cb0ce810ffea1a236812987ed37bc5449f39ee3f046be9e525c120c234c0d27"
+    },
+    {
+      "path": "reports\\readiness\\operational-readiness-dossier-2026-05-22T00-15-04-064Z.json",
+      "sha256": "fb8a5c9f0fcb422b6ae170e10df09ac7ce44e6a257630e24e137fd6658b6ae0c"
+    },
+    {
+      "path": "reports\\readiness\\operational-readiness-dossier-2026-05-22T00-25-40-480Z.json",
+      "sha256": "17991ae1a560518dba5146570b712d54ff30c9872aa0fe2c10edb359cbcf77c4"
+    },
+    {
+      "path": "reports\\readiness\\operational-readiness-dossier-2026-05-22T00-37-57-272Z.json",
+      "sha256": "0df877c61da43574a97001d19009bd9411367a6868827061ab6dd3afcf9632b7"
+    },
+    {
+      "path": "reports\\readiness\\operational-readiness-dossier-2026-05-22T00-43-37-977Z.json",
+      "sha256": "3481e724df03dd00ea6d85ffdef08a6555fdd5e1240d400fa7e352ebfa3ee8e9"
+    },
+    {
+      "path": "reports\\readiness\\operational-readiness-dossier-2026-05-22T00-44-36-378Z.json",
+      "sha256": "4d9c91aa2856f16c48c4692e6d3d970282a067b7c651faa28676fc7259ee52f8"
+    },
+    {
+      "path": "reports\\readiness\\operational-readiness-dossier-2026-05-22T14-54-33-585Z.json",
+      "sha256": "a5488dc704ae78cd74d845e67c821c7a19b9df8a948070108022cee453e25613"
+    },
+    {
+      "path": "reports\\readiness\\operational-readiness-dossier-2026-05-22T14-55-07-702Z.json",
+      "sha256": "2664b98fc9c177cc755672dde14c20b5b1bb5ed15bb443749f191fb578314697"
+    },
+    {
+      "path": "reports\\readiness\\operational-readiness-dossier-2026-05-22T15-04-59-341Z.json",
+      "sha256": "136f6eac72c809a0598080e5b4c024c3781dd1215c4207bf9e7c7c4c16a639b5"
+    },
+    {
+      "path": "reports\\readiness\\operational-readiness-dossier-2026-05-22T15-05-19-057Z.json",
+      "sha256": "cba52bc0d4b2cf9239d9fcc6fa44aa49b474f7cadcb400523d82da06dac54e72"
+    },
+    {
+      "path": "reports\\readiness\\operational-readiness-dossier-2026-05-22T17-25-00-472Z.json",
+      "sha256": "c97f66c8c7d11dc4508084799ec7621336fe71a59f38a01490404fe20e677df9"
+    },
+    {
+      "path": "reports\\runtime\\latest-vps-distributed-proof-dir.txt",
+      "sha256": "8a4ea4c8dc63fe961c52cf0bc49447b143cb4ea2f30d60f6dde8a2835a3aa6b6"
+    },
+    {
+      "path": "reports\\runtime\\local-poc-server.err.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports\\runtime\\local-poc-server.out.log",
+      "sha256": "1268eb20e3a14a455259a337736268219cc9fa20b75880001b639e999b20c3d9"
+    },
+    {
+      "path": "reports\\runtime\\local-server.err.log",
+      "sha256": "1378edae2c45b0f05ce43254d50caf423967b95126a5af1f3cf57a62a6d10791"
+    },
+    {
+      "path": "reports\\runtime\\local-server.out.log",
+      "sha256": "cb5d50b7f484deb3048738915c5a9af297ff0a412a3577fb219d0e309c5a115c"
+    },
+    {
+      "path": "reports\\runtime\\production-env-validation-2026-05-22T00-25-06-541Z.json",
+      "sha256": "830d7d7b3ae36dfd80c5f207a23dc47e3bcb41f88c5c39a3a919888c9f3ae815"
+    },
+    {
+      "path": "reports\\runtime\\production-env-validation-2026-05-22T14-52-39-950Z.json",
+      "sha256": "fefa2c82f5e1a806218c9196dde112b78cd396f8dd08d4c710043b36871f9d28"
+    },
+    {
+      "path": "reports\\runtime\\production-env-validation-2026-05-22T15-04-58-855Z.json",
+      "sha256": "cd3aa38d5203b5cea353ca06c9c9e63f09e7508fc4e8a2ccd9985cdd6f52054d"
+    },
+    {
+      "path": "reports\\runtime\\production-env-validation-2026-05-22T16-06-33-037Z.json",
+      "sha256": "d4150788a9dc734700d5e70a74887b79e07d51c11f7291b4c6bdfa05e836e60b"
+    },
+    {
+      "path": "reports\\runtime\\production-env-validation-2026-05-22T17-23-39-039Z.json",
+      "sha256": "dd7dc5dbec14e168ee022ffdcf2beeb7bcfad693f495f3b1ca7d94ae2641d2e8"
+    },
+    {
+      "path": "reports\\runtime\\vps-distributed-proof-2026-05-22T16-38-57Z\\commands.ndjson",
+      "sha256": "c9509f43f306cd31478e21f2976c52d344f0734da14988bba603a796f08696e1"
+    },
+    {
+      "path": "reports\\runtime\\vps-distributed-proof-2026-05-22T17-22-22Z\\commands.ndjson",
+      "sha256": "802fb93b79cfb5e32b83c783a556a45769e813b22827cb7a5f8cb6e7ab6da1f9"
+    },
+    {
+      "path": "reports\\security\\security-audit-2026-05-22T00-43-40-552Z.json",
+      "sha256": "b16c4da7c7751726215254f0231d25945bd0c7f14880da9effd03fda04fb40f5"
+    },
+    {
+      "path": "reports\\security\\security-audit-2026-05-22T00-44-19-898Z.json",
+      "sha256": "924bb71d49c6c2fd5b8588553ea1834a8b0b8c9f060a34fd16ba7c306e6da59f"
+    },
+    {
+      "path": "reports\\security\\security-audit-2026-05-22T14-54-35-210Z.json",
+      "sha256": "a0e6ddcdd0b75a63b4977a1833cbb34f7cff7aaff32520775bb41243b7025e8f"
+    },
+    {
+      "path": "reports\\security\\security-audit-2026-05-22T17-23-48-880Z.json",
+      "sha256": "2115d487611d4a8b377ad7d26191f87c4359a53495333467d6bad993197cda10"
+    },
+    {
+      "path": "reports\\telecom\\latest-live-telecom-proof-dir.txt",
+      "sha256": "ace7065a6c363d8af804457f869533735746e8d1528ebb21bbb33d9ee0ea8770"
+    },
+    {
+      "path": "reports\\telecom\\live-telecom-proof-2026-05-22T16-38-58Z\\commands.ndjson",
+      "sha256": "06c1a49cd5c08128e6013f8bf07e010e5f6fd36d54c9c83bd3987d02ff70389b"
+    },
+    {
+      "path": "reports\\telecom\\live-telecom-proof-2026-05-22T17-22-22Z\\commands.ndjson",
+      "sha256": "6ce09d3d1d98c507dddc7018a0bde1462f3f35219447ae413507163b4fb53fe0"
+    }
+  ],
+  "manifestSha256": "d17637d4eae7c09c05f38aef1814a772831927d044aa25f410c0c4c7c3b14d3e"
+}

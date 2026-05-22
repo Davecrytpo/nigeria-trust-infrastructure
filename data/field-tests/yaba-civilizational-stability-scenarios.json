@@ -1,0 +1,52 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate civilizational stability, panic dynamics, dependency balance, societal adaptation, intergenerational legitimacy, institutional interaction, civic resilience amplification, and systemic failure containment.",
+  "scenarios": [
+    {
+      "id": "destabilizing-systemic-interaction",
+      "name": "Infrastructure destabilizes society and triggers systemic freeze",
+      "input": {
+        "stability": { "communityStabilizationScore": 0.22, "panicReductionScore": 0.2, "coordinationResilienceScore": 0.3, "institutionalTrustStrengtheningScore": 0.24, "civicContinuityScore": 0.28, "socialCohesionScore": 0.26, "fearAmplificationRate": 0.72, "dependencyFragilityIncrease": 0.7, "authorityCentralizationPressure": 0.74, "informalResilienceWeakeningRate": 0.68, "publicAnxietyRate": 0.66, "coordinationMonocultureRisk": 0.7 },
+        "panic": { "rumorPropagationRate": 0.74, "misinformationAmplificationRate": 0.7, "panicEscalationLoopRate": 0.72, "falseAlertContagionRate": 0.68, "trustCollapseCascadeRisk": 0.76, "institutionalConfusionRate": 0.66 },
+        "dependency": { "overDependenceRate": 0.76, "localInitiativeReductionRate": 0.7, "behavioralPassivityRate": 0.68, "institutionalRelianceImbalance": 0.72, "coordinationMonocultureRisk": 0.74, "communityFallbackWeakness": 0.66 },
+        "behavior": { "communityBehaviorDistortionRate": 0.68, "responderCultureDriftRate": 0.66, "governanceBehaviorShiftRate": 0.72, "operatorAuthorityPsychologyRisk": 0.7, "expectationNormalizationRisk": 0.74, "emergencyBehaviorDistortionRate": 0.68 },
+        "intergenerational": { "futureGenerationTrustScore": 0.28, "governanceUnderstandabilityOverTime": 0.3, "civicNormAssumptionDriftRate": 0.72, "legitimacyPersistenceRisk": 0.7, "societalTransformationMismatch": 0.68 },
+        "institutions": { "institutionalDependencyRate": 0.72, "institutionalComplacencyRate": 0.68, "interAgencyCompetitionRate": 0.7, "authorityConflictRate": 0.74, "governanceFragmentationRate": 0.72, "crisisCoordinationPoliticsRate": 0.7 },
+        "resilience": { "localCoordinationStrengthening": 0.24, "communityInitiativeSupport": 0.2, "humanPreparednessImprovement": 0.26, "distributedResilienceIncrease": 0.22, "decentralizedProblemSolvingPreservation": 0.2, "localFallbackTrainingScore": 0.18 },
+        "containment": { "infrastructureFailureDestabilizationRisk": 0.76, "degradedModePanicRisk": 0.7, "expectationCollapseDistrustRisk": 0.74, "institutionalDependencyCascadeRisk": 0.72, "safeFailureModeScore": 0.24 }
+      },
+      "expectedPosture": "civilizational-stability-freeze"
+    },
+    {
+      "id": "resilience-fragile-reinforcement",
+      "name": "Societal effects require reinforcement before expansion",
+      "input": {
+        "stability": { "communityStabilizationScore": 0.48, "panicReductionScore": 0.46, "coordinationResilienceScore": 0.5, "institutionalTrustStrengtheningScore": 0.48, "civicContinuityScore": 0.5, "socialCohesionScore": 0.48, "fearAmplificationRate": 0.38, "dependencyFragilityIncrease": 0.42, "authorityCentralizationPressure": 0.4, "informalResilienceWeakeningRate": 0.42, "publicAnxietyRate": 0.38, "coordinationMonocultureRisk": 0.42 },
+        "panic": { "rumorPropagationRate": 0.42, "misinformationAmplificationRate": 0.4, "panicEscalationLoopRate": 0.38, "falseAlertContagionRate": 0.36, "trustCollapseCascadeRisk": 0.42, "institutionalConfusionRate": 0.4 },
+        "dependency": { "overDependenceRate": 0.44, "localInitiativeReductionRate": 0.42, "behavioralPassivityRate": 0.38, "institutionalRelianceImbalance": 0.42, "coordinationMonocultureRisk": 0.44, "communityFallbackWeakness": 0.4 },
+        "behavior": { "communityBehaviorDistortionRate": 0.38, "responderCultureDriftRate": 0.36, "governanceBehaviorShiftRate": 0.4, "operatorAuthorityPsychologyRisk": 0.42, "expectationNormalizationRisk": 0.42, "emergencyBehaviorDistortionRate": 0.38 },
+        "intergenerational": { "futureGenerationTrustScore": 0.58, "governanceUnderstandabilityOverTime": 0.56, "civicNormAssumptionDriftRate": 0.4, "legitimacyPersistenceRisk": 0.42, "societalTransformationMismatch": 0.4 },
+        "institutions": { "institutionalDependencyRate": 0.42, "institutionalComplacencyRate": 0.4, "interAgencyCompetitionRate": 0.38, "authorityConflictRate": 0.42, "governanceFragmentationRate": 0.42, "crisisCoordinationPoliticsRate": 0.4 },
+        "resilience": { "localCoordinationStrengthening": 0.44, "communityInitiativeSupport": 0.42, "humanPreparednessImprovement": 0.46, "distributedResilienceIncrease": 0.44, "decentralizedProblemSolvingPreservation": 0.42, "localFallbackTrainingScore": 0.4 },
+        "containment": { "infrastructureFailureDestabilizationRisk": 0.42, "degradedModePanicRisk": 0.38, "expectationCollapseDistrustRisk": 0.42, "institutionalDependencyCascadeRisk": 0.4, "safeFailureModeScore": 0.56 }
+      },
+      "expectedPosture": "restrict-and-reinforce-societal-resilience"
+    },
+    {
+      "id": "resilience-amplifying-operation",
+      "name": "Distributed civic resilience is strengthened",
+      "input": {
+        "stability": { "communityStabilizationScore": 0.82, "panicReductionScore": 0.78, "coordinationResilienceScore": 0.84, "institutionalTrustStrengtheningScore": 0.76, "civicContinuityScore": 0.82, "socialCohesionScore": 0.8, "fearAmplificationRate": 0.08, "dependencyFragilityIncrease": 0.1, "authorityCentralizationPressure": 0.08, "informalResilienceWeakeningRate": 0.06, "publicAnxietyRate": 0.08, "coordinationMonocultureRisk": 0.08 },
+        "panic": { "rumorPropagationRate": 0.08, "misinformationAmplificationRate": 0.06, "panicEscalationLoopRate": 0.06, "falseAlertContagionRate": 0.08, "trustCollapseCascadeRisk": 0.08, "institutionalConfusionRate": 0.1 },
+        "dependency": { "overDependenceRate": 0.1, "localInitiativeReductionRate": 0.08, "behavioralPassivityRate": 0.06, "institutionalRelianceImbalance": 0.1, "coordinationMonocultureRisk": 0.08, "communityFallbackWeakness": 0.1 },
+        "behavior": { "communityBehaviorDistortionRate": 0.08, "responderCultureDriftRate": 0.08, "governanceBehaviorShiftRate": 0.08, "operatorAuthorityPsychologyRisk": 0.08, "expectationNormalizationRisk": 0.08, "emergencyBehaviorDistortionRate": 0.08 },
+        "intergenerational": { "futureGenerationTrustScore": 0.82, "governanceUnderstandabilityOverTime": 0.84, "civicNormAssumptionDriftRate": 0.1, "legitimacyPersistenceRisk": 0.08, "societalTransformationMismatch": 0.1 },
+        "institutions": { "institutionalDependencyRate": 0.12, "institutionalComplacencyRate": 0.08, "interAgencyCompetitionRate": 0.08, "authorityConflictRate": 0.08, "governanceFragmentationRate": 0.08, "crisisCoordinationPoliticsRate": 0.08 },
+        "resilience": { "localCoordinationStrengthening": 0.82, "communityInitiativeSupport": 0.8, "humanPreparednessImprovement": 0.84, "distributedResilienceIncrease": 0.82, "decentralizedProblemSolvingPreservation": 0.8, "localFallbackTrainingScore": 0.78 },
+        "containment": { "infrastructureFailureDestabilizationRisk": 0.08, "degradedModePanicRisk": 0.08, "expectationCollapseDistrustRisk": 0.08, "institutionalDependencyCascadeRisk": 0.08, "safeFailureModeScore": 0.86 }
+      },
+      "expectedPosture": "continue-resilience-amplifying-civic-operation"
+    }
+  ]
+}

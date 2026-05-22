@@ -1,0 +1,66 @@
+{
+  "checkedAt": "2026-05-22T17:23:39.014Z",
+  "checks": [
+    {
+      "name": "OPS_ACCESS_KEY",
+      "status": "failed",
+      "detail": ""
+    },
+    {
+      "name": "POSTGRES_PASSWORD",
+      "status": "failed",
+      "detail": ""
+    },
+    {
+      "name": "GRAFANA_ADMIN_PASSWORD",
+      "status": "failed",
+      "detail": ""
+    },
+    {
+      "name": "OPERATOR_SESSION_SECRET",
+      "status": "failed",
+      "detail": ""
+    },
+    {
+      "name": "PUBLIC_BASE_URL_HTTPS",
+      "status": "failed",
+      "detail": ""
+    },
+    {
+      "name": "TELECOM_WEBHOOK_URLS_HTTPS",
+      "status": "failed",
+      "detail": ""
+    },
+    {
+      "name": "TELECOM_WEBHOOK_SIGNATURE_REQUIRED",
+      "status": "failed",
+      "detail": ""
+    },
+    {
+      "name": "RATE_LIMIT_MAX_REQUESTS",
+      "status": "failed",
+      "detail": ""
+    },
+    {
+      "name": "RATE_LIMIT_WINDOW_MS",
+      "status": "failed",
+      "detail": ""
+    },
+    {
+      "name": "TWILIO_CONFIGURED",
+      "status": "failed",
+      "detail": ""
+    },
+    {
+      "name": "AFRICAS_TALKING_CONFIGURED",
+      "status": "failed",
+      "detail": ""
+    },
+    {
+      "name": "INFOBIP_CONFIGURED",
+      "status": "failed",
+      "detail": ""
+    }
+  ],
+  "status": "failed"
+}

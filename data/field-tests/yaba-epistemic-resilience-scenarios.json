@@ -1,0 +1,144 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate epistemic humility, memory decay, contradiction-aware reasoning, multi-perspective truth, and historical overconfidence controls.",
+  "scenarios": [
+    {
+      "id": "historical-overconfidence-freeze",
+      "name": "Repeated patterns are misused as certainty",
+      "input": {
+        "asOfDate": "2026-05-21",
+        "knowledge": {
+          "sampleCoverageRate": 0.25,
+          "independentSourceCoverage": 0.3,
+          "daysSinceLastObservation": 18,
+          "contradictionRate": 0.42,
+          "modelErrorRate": 0.38,
+          "unexplainedIncidentRate": 0.3
+        },
+        "memoryRecords": [
+          {
+            "id": "old-telecom-stability-pattern",
+            "observedAt": "2026-01-01",
+            "confidence": 0.9,
+            "recurrenceCount": 3,
+            "contradictionRate": 0.4
+          }
+        ],
+        "overconfidence": {
+          "historicalConfidence": 0.9,
+          "recentContradictionRate": 0.32,
+          "repeatedPatternCount": 10,
+          "independentValidationRate": 0.4,
+          "chronicRiskKnownDays": 45,
+          "operationalRestrictionLevel": "normal",
+          "memoryUsedAsCertificationEvidence": true,
+          "governanceReviewCadenceDays": 21,
+          "familiarityWithRegion": 0.86,
+          "stabilityTrendScore": 0.9,
+          "hiddenAnomalyRate": 0.22
+        },
+        "perspectives": {
+          "operator": 0.86,
+          "responder": 0.42,
+          "telemetry": 0.3,
+          "replay": 0.74,
+          "governance": 0.5
+        }
+      },
+      "expectedDecision": "freeze-certainty-claims"
+    },
+    {
+      "id": "conflicted-truth-restricts-decisioning",
+      "name": "Conflicting perspectives force uncertainty-first posture",
+      "input": {
+        "asOfDate": "2026-05-21",
+        "knowledge": {
+          "sampleCoverageRate": 0.48,
+          "independentSourceCoverage": 0.52,
+          "daysSinceLastObservation": 9,
+          "contradictionRate": 0.34,
+          "modelErrorRate": 0.26,
+          "unexplainedIncidentRate": 0.22
+        },
+        "memoryRecords": [
+          {
+            "id": "recent-responder-pattern",
+            "observedAt": "2026-05-10",
+            "confidence": 0.62,
+            "recurrenceCount": 2,
+            "contradictionRate": 0.25
+          }
+        ],
+        "overconfidence": {
+          "historicalConfidence": 0.74,
+          "recentContradictionRate": 0.22,
+          "repeatedPatternCount": 5,
+          "independentValidationRate": 0.58,
+          "chronicRiskKnownDays": 20,
+          "operationalRestrictionLevel": "restricted",
+          "memoryUsedAsCertificationEvidence": false,
+          "governanceReviewCadenceDays": 10,
+          "familiarityWithRegion": 0.68,
+          "stabilityTrendScore": 0.7,
+          "hiddenAnomalyRate": 0.12
+        },
+        "perspectives": {
+          "operator": 0.82,
+          "responder": 0.38,
+          "telemetry": 0.32,
+          "replay": 0.66,
+          "governance": 0.44,
+          "telecom": 0.36
+        }
+      },
+      "expectedDecision": "restrict-to-uncertainty-first-decisions"
+    },
+    {
+      "id": "conditional-supervised-decisions",
+      "name": "Partial knowledge allows only conditional supervision",
+      "input": {
+        "asOfDate": "2026-05-21",
+        "knowledge": {
+          "sampleCoverageRate": 0.62,
+          "independentSourceCoverage": 0.7,
+          "daysSinceLastObservation": 5,
+          "contradictionRate": 0.18,
+          "modelErrorRate": 0.16,
+          "unexplainedIncidentRate": 0.1
+        },
+        "memoryRecords": [
+          {
+            "id": "recent-telecom-pattern",
+            "observedAt": "2026-05-18",
+            "confidence": 0.66,
+            "recurrenceCount": 3,
+            "contradictionRate": 0.08
+          }
+        ],
+        "overconfidence": {
+          "historicalConfidence": 0.68,
+          "recentContradictionRate": 0.12,
+          "repeatedPatternCount": 4,
+          "independentValidationRate": 0.72,
+          "chronicRiskKnownDays": 10,
+          "operationalRestrictionLevel": "restricted",
+          "memoryUsedAsCertificationEvidence": false,
+          "governanceReviewCadenceDays": 7,
+          "familiarityWithRegion": 0.55,
+          "stabilityTrendScore": 0.62,
+          "hiddenAnomalyRate": 0.08
+        },
+        "perspectives": {
+          "operator": 0.68,
+          "responder": 0.62,
+          "telemetry": 0.6,
+          "replay": 0.7,
+          "governance": 0.64,
+          "telecom": 0.58
+        }
+      },
+      "expectedDecision": "allow-conditional-supervised-decisions"
+    }
+  ]
+}

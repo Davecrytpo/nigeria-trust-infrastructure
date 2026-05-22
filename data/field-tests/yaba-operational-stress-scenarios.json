@@ -1,0 +1,238 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Expose operational stress, telecom reality, human failure, trust degradation, and disaster-mode collapse risks.",
+  "acceptanceMetrics": {
+    "maxAcknowledgmentLatencyMs": 180000,
+    "minOfflineRecoveryRate": 0.95,
+    "maxDuplicateIncidentRate": 0.03,
+    "minCriticalEventRetentionRate": 1,
+    "maxOperatorAmbiguityCount": 0,
+    "minReplayConsistencyRate": 0.98,
+    "maxOperatorDecisionLatencyMs": 120000,
+    "minResponderReliabilityRate": 0.92,
+    "minTrustIntegrityRate": 0.97,
+    "minTelecomReceiptIntegrityRate": 0.95,
+    "minDisasterCoordinationRate": 0.9
+  },
+  "scenarios": [
+    {
+      "id": "offline-reconnect-storm-sqlite-corruption",
+      "name": "Offline reconnect storm with SQLite queue corruption",
+      "category": "offline_recovery",
+      "incidentCount": 4,
+      "responderCount": 10,
+      "operatorCount": 1,
+      "conditions": {
+        "networkDropRate": 0.58,
+        "smsDelayMs": 180000,
+        "gpsDriftMeters": 100,
+        "backgroundTerminationRate": 0.5,
+        "batteryLevelPercent": 9,
+        "queueDurability": true,
+        "sqliteCorruptionRate": 0.08,
+        "reconnectStormMultiplier": 5,
+        "dnsInstabilityRate": 0.2,
+        "operationalControls": {
+          "encryptedWalQueue": true,
+          "idempotentOfflineReplay": true,
+          "syncCheckpointing": true,
+          "queueCorruptionQuarantine": true,
+          "deterministicReplayOrdering": true,
+          "edgeRetryRouting": true,
+          "backgroundSosRecovery": true,
+          "appKillRecovery": true,
+          "lowBatterySosMode": true,
+          "duplicateSuppression": true,
+          "adaptivePriorityQueue": true,
+          "operatorSurgeRouting": true
+        }
+      },
+      "expected": {
+        "acknowledged": true,
+        "operatorEscalation": true,
+        "offlineRecovery": true,
+        "criticalEventsRetained": true
+      }
+    },
+    {
+      "id": "operator-fatigue-confused-users",
+      "name": "Operator fatigue with confused users and accidental activations",
+      "category": "human_stress",
+      "incidentCount": 9,
+      "responderCount": 14,
+      "operatorCount": 1,
+      "conditions": {
+        "networkDropRate": 0.28,
+        "smsDelayMs": 95000,
+        "gpsDriftMeters": 140,
+        "backgroundTerminationRate": 0.18,
+        "batteryLevelPercent": 24,
+        "queueDurability": true,
+        "operatorFatigueHours": 14,
+        "confusedUserRate": 0.35,
+        "panicTriggerDelayRate": 0.28,
+        "accidentalActivationRate": 0.18,
+        "responderNonComplianceRate": 0.12,
+        "operationalControls": {
+          "encryptedWalQueue": true,
+          "idempotentOfflineReplay": true,
+          "syncCheckpointing": true,
+          "backgroundSosRecovery": true,
+          "appKillRecovery": true,
+          "adaptivePriorityQueue": true,
+          "operatorSurgeRouting": true,
+          "operatorQueuePartitioning": true,
+          "incidentTriageUx": true,
+          "shiftHandoffProtection": true,
+          "responderLoadBalancing": true,
+          "responderAckEscalation": true,
+          "duplicateSuppression": true
+        }
+      },
+      "expected": {
+        "acknowledged": true,
+        "operatorEscalation": true,
+        "offlineRecovery": true,
+        "criticalEventsRetained": true
+      }
+    },
+    {
+      "id": "mtn-congestion-duplicate-sms-dropped-receipts",
+      "name": "MTN congestion with duplicate SMS and dropped delivery receipts",
+      "category": "telecom_reality",
+      "incidentCount": 6,
+      "responderCount": 12,
+      "operatorCount": 2,
+      "conditions": {
+        "networkDropRate": 0.48,
+        "smsDelayMs": 260000,
+        "gpsDriftMeters": 90,
+        "backgroundTerminationRate": 0.25,
+        "batteryLevelPercent": 31,
+        "queueDurability": true,
+        "mtnCongestionRate": 0.65,
+        "duplicateSmsRate": 0.22,
+        "droppedDeliveryReceiptRate": 0.45,
+        "twoGFallbackRate": 0.55,
+        "dnsInstabilityRate": 0.25,
+        "operationalControls": {
+          "encryptedWalQueue": true,
+          "idempotentOfflineReplay": true,
+          "syncCheckpointing": true,
+          "deterministicReplayOrdering": true,
+          "smsProviderFailover": true,
+          "receiptReconciliation": true,
+          "crossProviderReceiptAudit": true,
+          "ussdFallback": true,
+          "edgeRetryRouting": true,
+          "backgroundSosRecovery": true,
+          "appKillRecovery": true,
+          "duplicateSuppression": true,
+          "adaptivePriorityQueue": true,
+          "operatorSurgeRouting": true
+        }
+      },
+      "expected": {
+        "acknowledged": true,
+        "operatorEscalation": true,
+        "offlineRecovery": true,
+        "criticalEventsRetained": true
+      }
+    },
+    {
+      "id": "coordinated-spam-fake-verification",
+      "name": "Coordinated spam with fake verification and trust manipulation",
+      "category": "trust_integrity",
+      "incidentCount": 12,
+      "responderCount": 16,
+      "operatorCount": 2,
+      "conditions": {
+        "networkDropRate": 0.18,
+        "smsDelayMs": 60000,
+        "gpsDriftMeters": 70,
+        "backgroundTerminationRate": 0.08,
+        "batteryLevelPercent": 48,
+        "queueDurability": true,
+        "maliciousFalseReportRate": 0.42,
+        "fakeVerificationAttemptRate": 0.22,
+        "coordinatedSpamRate": 0.35,
+        "trustScoreManipulationRate": 0.18,
+        "coercionRiskRate": 0.08,
+        "operationalControls": {
+          "encryptedWalQueue": true,
+          "idempotentOfflineReplay": true,
+          "syncCheckpointing": true,
+          "duplicateSuppression": true,
+          "adaptivePriorityQueue": true,
+          "operatorSurgeRouting": true,
+          "operatorQueuePartitioning": true,
+          "spamQuarantine": true,
+          "deviceAttestation": true,
+          "trustMutationAudit": true,
+          "duressReviewGate": true
+        }
+      },
+      "expected": {
+        "acknowledged": true,
+        "operatorEscalation": true,
+        "offlineRecovery": true,
+        "criticalEventsRetained": true
+      }
+    },
+    {
+      "id": "neighborhood-blackout-flood-disaster",
+      "name": "Neighborhood blackout and flood-scale disaster mode",
+      "category": "disaster_mode",
+      "incidentCount": 45,
+      "responderCount": 22,
+      "operatorCount": 3,
+      "conditions": {
+        "networkDropRate": 0.62,
+        "smsDelayMs": 300000,
+        "gpsDriftMeters": 260,
+        "backgroundTerminationRate": 0.38,
+        "batteryLevelPercent": 16,
+        "queueDurability": true,
+        "blackoutAreaRate": 0.55,
+        "institutionalFailureRate": 0.45,
+        "responderNonComplianceRate": 0.18,
+        "mtnCongestionRate": 0.72,
+        "droppedDeliveryReceiptRate": 0.5,
+        "twoGFallbackRate": 0.7,
+        "operationalControls": {
+          "encryptedWalQueue": true,
+          "idempotentOfflineReplay": true,
+          "syncCheckpointing": true,
+          "deterministicReplayOrdering": true,
+          "smsProviderFailover": true,
+          "receiptReconciliation": true,
+          "crossProviderReceiptAudit": true,
+          "ussdFallback": true,
+          "edgeRetryRouting": true,
+          "backgroundSosRecovery": true,
+          "appKillRecovery": true,
+          "gpsDriftCompensation": true,
+          "adaptivePriorityQueue": true,
+          "operatorSurgeRouting": true,
+          "operatorQueuePartitioning": true,
+          "incidentTriageUx": true,
+          "supervisorEscalationRails": true,
+          "responderLoadBalancing": true,
+          "responderAckEscalation": true,
+          "regionalIncidentClustering": true,
+          "scarcityDispatchMode": true,
+          "offlineCommunityFallback": true,
+          "degradedInstitutionalRouting": true,
+          "duplicateSuppression": true
+        }
+      },
+      "expected": {
+        "acknowledged": true,
+        "operatorEscalation": true,
+        "offlineRecovery": true,
+        "criticalEventsRetained": true
+      }
+    }
+  ]
+}

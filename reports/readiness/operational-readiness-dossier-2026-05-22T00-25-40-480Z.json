@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-05-22T00:25:40.468Z",
+  "evidenceDir": null,
+  "readiness": {
+    "status": "evidence-incomplete",
+    "blockers": [
+      "runtime validation has not passed on live containers",
+      "failure drills have not passed on live containers",
+      "mobile validation has not passed on a real device/emulator"
+    ]
+  },
+  "summary": {
+    "runtimeValidation": "missing",
+    "failureDrills": "missing",
+    "mobileValidation": "failed",
+    "commandFailures": [],
+    "runtimeMeasurements": {},
+    "failureDrillCount": 0,
+    "mobileDevice": {
+      "id": "local-smoke",
+      "model": "not-connected",
+      "androidVersion": "unknown",
+      "batterySaver": false,
+      "networkProfile": "none"
+    }
+  },
+  "reports": {
+    "runtimeValidationReports": [],
+    "failureDrillReports": [],
+    "mobileReports": [
+      "reports\\mobile\\device-validation-2026-05-21T23-48-27-802Z.json"
+    ]
+  },
+  "requiredLiveProof": [
+    "runtime:validate on Docker-capable Linux host",
+    "runtime:failure-drills on Docker-capable Linux host",
+    "mobile:capture-validation from Android app-kill/reboot/offline replay tests",
+    "telecom provider sandbox/live receipt and failover evidence",
+    "Prometheus/Grafana scrape and dashboard evidence"
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate constrained Yaba field pilot preparation, safety limits, observability, telecom validation, and human readiness.",
+  "scenarios": [
+    {
+      "id": "overbroad-consumer-rollout",
+      "name": "Overbroad consumer-style rollout attempt",
+      "input": {
+        "governanceDecision": "approve-controlled-pilot",
+        "scope": {
+          "residentCount": 900,
+          "responderCount": 70,
+          "operatorCount": 1,
+          "dailyOperationalHours": 14,
+          "permittedIncidentCategories": ["medical", "kidnap", "violent-crime"],
+          "singleNeighborhood": false
+        },
+        "human": {
+          "responderOnboardingCompletion": 0.9,
+          "operatorTrainingCompletion": 0.9,
+          "supervisorReviewReadiness": 0.9,
+          "escalationCommsDrillCompletion": 0.9,
+          "degradedModeTrainingCompletion": 0.9,
+          "telecomFailureDrillCompletion": 0.9,
+          "incidentReviewWorkflowReadiness": 0.9
+        },
+        "observability": {
+          "degradedStateVisibility": 0.9,
+          "operatorCognitiveLoadVisibility": 0.9,
+          "telecomInstabilityVisibility": 0.9,
+          "replayDivergenceVisibility": 0.9,
+          "trustVolatilityVisibility": 0.9,
+          "institutionalNonResponseVisibility": 0.9,
+          "escalationBottleneckVisibility": 0.9,
+          "recoveryConvergenceVisibility": 0.9
+        },
+        "safety": {
+          "trustConfidenceScore": 0.9,
+          "operatorLoadPerOperator": 3,
+          "telecomHealthScore": 0.8,
+          "replayDivergenceRate": 0,
+          "institutionalAcknowledgmentRate": 0.8,
+          "activeDegradedModes": 0,
+          "lifeSafetyHighRiskRate": 0.05
+        },
+        "telecom": {
+          "p95SmsLatencySeconds": 150,
+          "deliveryReceiptConfidence": 0.82,
+          "providerConsistencyScore": 0.8,
+          "lowBatteryDeliveryReliability": 0.8,
+          "androidBackgroundReliability": 0.78,
+          "prolongedOfflineRecoveryRate": 0.8
+        }
+      },
+      "expectedDecision": "do-not-run-field-pilot"
+    },
+    {
+      "id": "blind-observability",
+      "name": "Pilot with insufficient live observability",
+      "input": {
+        "governanceDecision": "approve-controlled-pilot",
+        "scope": {
+          "residentCount": 220,
+          "responderCount": 18,
+          "operatorCount": 3,
+          "dailyOperationalHours": 6,
+          "permittedIncidentCategories": ["medical", "help"],
+          "singleNeighborhood": true
+        },
+        "human": {
+          "responderOnboardingCompletion": 0.9,
+          "operatorTrainingCompletion": 0.9,
+          "supervisorReviewReadiness": 0.9,
+          "escalationCommsDrillCompletion": 0.9,
+          "degradedModeTrainingCompletion": 0.9,
+          "telecomFailureDrillCompletion": 0.9,
+          "incidentReviewWorkflowReadiness": 0.9
+        },
+        "observability": {
+          "degradedStateVisibility": 0.42,
+          "operatorCognitiveLoadVisibility": 0.38,
+          "telecomInstabilityVisibility": 0.5,
+          "replayDivergenceVisibility": 0.36,
+          "trustVolatilityVisibility": 0.44,
+          "institutionalNonResponseVisibility": 0.4,
+          "escalationBottleneckVisibility": 0.48,
+          "recoveryConvergenceVisibility": 0.34
+        },
+        "safety": {
+          "trustConfidenceScore": 0.86,
+          "operatorLoadPerOperator": 3,
+          "telecomHealthScore": 0.75,
+          "replayDivergenceRate": 0,
+          "institutionalAcknowledgmentRate": 0.72,
+          "activeDegradedModes": 0,
+          "lifeSafetyHighRiskRate": 0.05
+        },
+        "telecom": {
+          "p95SmsLatencySeconds": 170,
+          "deliveryReceiptConfidence": 0.78,
+          "providerConsistencyScore": 0.74,
+          "lowBatteryDeliveryReliability": 0.76,
+          "androidBackgroundReliability": 0.72,
+          "prolongedOfflineRecoveryRate": 0.78
+        }
+      },
+      "expectedDecision": "do-not-run-field-pilot"
+    },
+    {
+      "id": "constrained-supervised-pilot",
+      "name": "Constrained supervised field pilot",
+      "input": {
+        "governanceDecision": "approve-controlled-pilot",
+        "scope": {
+          "residentCount": 220,
+          "responderCount": 18,
+          "operatorCount": 3,
+          "dailyOperationalHours": 6,
+          "permittedIncidentCategories": ["medical", "help", "suspicious-activity"],
+          "singleNeighborhood": true
+        },
+        "human": {
+          "responderOnboardingCompletion": 0.9,
+          "operatorTrainingCompletion": 0.92,
+          "supervisorReviewReadiness": 0.9,
+          "escalationCommsDrillCompletion": 0.88,
+          "degradedModeTrainingCompletion": 0.9,
+          "telecomFailureDrillCompletion": 0.88,
+          "incidentReviewWorkflowReadiness": 0.9
+        },
+        "observability": {
+          "degradedStateVisibility": 0.9,
+          "operatorCognitiveLoadVisibility": 0.88,
+          "telecomInstabilityVisibility": 0.9,
+          "replayDivergenceVisibility": 0.88,
+          "trustVolatilityVisibility": 0.9,
+          "institutionalNonResponseVisibility": 0.88,
+          "escalationBottleneckVisibility": 0.88,
+          "recoveryConvergenceVisibility": 0.9
+        },
+        "safety": {
+          "trustConfidenceScore": 0.86,
+          "operatorLoadPerOperator": 3,
+          "telecomHealthScore": 0.74,
+          "replayDivergenceRate": 0,
+          "institutionalAcknowledgmentRate": 0.72,
+          "activeDegradedModes": 0,
+          "lifeSafetyHighRiskRate": 0.05
+        },
+        "telecom": {
+          "p95SmsLatencySeconds": 170,
+          "deliveryReceiptConfidence": 0.78,
+          "providerConsistencyScore": 0.74,
+          "lowBatteryDeliveryReliability": 0.76,
+          "androidBackgroundReliability": 0.72,
+          "prolongedOfflineRecoveryRate": 0.78
+        }
+      },
+      "expectedDecision": "run-limited-supervised-pilot"
+    }
+  ]
+}

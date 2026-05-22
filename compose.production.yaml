@@ -1,0 +1,111 @@
+services:
+  api:
+    build:
+      context: .
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3000
+      OPS_ACCESS_KEY: ${OPS_ACCESS_KEY:-change-this-before-field-use}
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://nigeria_trust:${POSTGRES_PASSWORD:-change-this-before-field-use}@postgres:5432/nigeria_trust
+    ports:
+      - "3000:3000"
+    volumes:
+      - api-state:/app/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  migrate:
+    build:
+      context: .
+    environment:
+      DATABASE_URL: postgres://nigeria_trust:${POSTGRES_PASSWORD:-change-this-before-field-use}@postgres:5432/nigeria_trust
+    command: ["node", "scripts/db/migrate.js"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  seed:
+    build:
+      context: .
+    environment:
+      DATABASE_URL: postgres://nigeria_trust:${POSTGRES_PASSWORD:-change-this-before-field-use}@postgres:5432/nigeria_trust
+    command: ["node", "scripts/db/seed-operational-data.js"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: "no"
+
+  delivery-worker:
+    build:
+      context: .
+    environment:
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://nigeria_trust:${POSTGRES_PASSWORD:-change-this-before-field-use}@postgres:5432/nigeria_trust
+    command: ["node", "scripts/workers/delivery-worker.js"]
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+
+  replay-worker:
+    build:
+      context: .
+    environment:
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://nigeria_trust:${POSTGRES_PASSWORD:-change-this-before-field-use}@postgres:5432/nigeria_trust
+    command: ["node", "scripts/workers/replay-worker.js"]
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+
+  operator-queue-worker:
+    build:
+      context: .
+    environment:
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://nigeria_trust:${POSTGRES_PASSWORD:-change-this-before-field-use}@postgres:5432/nigeria_trust
+    command: ["node", "scripts/workers/operator-queue-worker.js"]
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  postgres:
+    image: postgis/postgis:16-3.4-alpine
+    environment:
+      POSTGRES_DB: nigeria_trust
+      POSTGRES_USER: nigeria_trust
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-this-before-field-use}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nigeria_trust -d nigeria_trust"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  api-state:
+  redis-data:
+  postgres-data:

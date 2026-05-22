@@ -1,0 +1,144 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate controlled low-risk live operationalization, telecom truth acquisition, human behavior observation, governance friction modeling, incident review discipline, and non-certifying live learning.",
+  "scenarios": [
+    {
+      "id": "high-authority-rollout-blocked",
+      "name": "High-authority incident categories are blocked",
+      "input": {
+        "readinessGates": { "field": false, "stress": false, "convergence": false },
+        "scope": {
+          "singleNeighborhood": false,
+          "residentCount": 420,
+          "responderCount": 30,
+          "operatorCount": 1,
+          "supervisorCount": 0,
+          "dailyOperationalHours": 9,
+          "shutdownAuthorityAssigned": false,
+          "auditTrailMandatory": false,
+          "rollbackPlanTested": false,
+          "permittedIncidentCategories": ["welfare-check", "armed-robbery", "kidnapping"]
+        }
+      },
+      "expectedDecision": "do-not-run-or-pause-live-pilot"
+    },
+    {
+      "id": "telecom-truth-pauses-dependence",
+      "name": "Unsafe live telecom evidence pauses telecom-dependent operation",
+      "input": {
+        "readinessGates": { "field": false, "stress": false, "convergence": false },
+        "scope": {
+          "singleNeighborhood": true,
+          "residentCount": 80,
+          "responderCount": 8,
+          "operatorCount": 2,
+          "supervisorCount": 1,
+          "dailyOperationalHours": 3,
+          "shutdownAuthorityAssigned": true,
+          "auditTrailMandatory": true,
+          "rollbackPlanTested": true,
+          "permittedIncidentCategories": ["welfare-check", "blackout-coordination"]
+        },
+        "telecom": {
+          "p95SmsLatencySeconds": 760,
+          "providerAsymmetryScore": 0.72,
+          "androidOemInconsistencyRate": 0.64,
+          "offlineSyncRestorationRate": 0.38,
+          "lowBatteryDeliveryFailureRate": 0.58,
+          "networkOscillationRate": 0.62,
+          "telecomSampleCompleteness": 0.5
+        }
+      },
+      "expectedDecision": "do-not-run-or-pause-live-pilot"
+    },
+    {
+      "id": "weak-review-discipline-shadow-only",
+      "name": "Incomplete incident review blocks operational truth claims",
+      "input": {
+        "readinessGates": { "field": false, "stress": false, "convergence": false },
+        "scope": {
+          "singleNeighborhood": true,
+          "residentCount": 70,
+          "responderCount": 6,
+          "operatorCount": 2,
+          "supervisorCount": 1,
+          "dailyOperationalHours": 3,
+          "shutdownAuthorityAssigned": true,
+          "auditTrailMandatory": true,
+          "rollbackPlanTested": true,
+          "permittedIncidentCategories": ["welfare-check", "flood-awareness"]
+        },
+        "incidentReviews": [
+          {
+            "replayReviewCompleted": true,
+            "governanceReviewCompleted": true,
+            "responderReviewCompleted": false,
+            "telecomReviewCompleted": false,
+            "confusionReviewCompleted": true,
+            "modelDivergenceReviewCompleted": false,
+            "uncertaintyReviewCompleted": false
+          }
+        ]
+      },
+      "expectedDecision": "shadow-only-until-review-discipline-recovers"
+    },
+    {
+      "id": "low-risk-live-learning",
+      "name": "Small low-risk live observation may proceed without certifying readiness",
+      "input": {
+        "readinessGates": { "field": false, "stress": false, "convergence": false },
+        "scope": {
+          "singleNeighborhood": true,
+          "residentCount": 90,
+          "responderCount": 8,
+          "operatorCount": 2,
+          "supervisorCount": 1,
+          "dailyOperationalHours": 3,
+          "shutdownAuthorityAssigned": true,
+          "auditTrailMandatory": true,
+          "rollbackPlanTested": true,
+          "permittedIncidentCategories": ["welfare-check", "low-severity-medical", "blackout-coordination", "flood-awareness"]
+        },
+        "telecom": {
+          "p95SmsLatencySeconds": 210,
+          "providerAsymmetryScore": 0.18,
+          "androidOemInconsistencyRate": 0.16,
+          "offlineSyncRestorationRate": 0.82,
+          "lowBatteryDeliveryFailureRate": 0.12,
+          "networkOscillationRate": 0.16,
+          "telecomSampleCompleteness": 0.9
+        },
+        "human": {
+          "operatorHesitationRate": 0.12,
+          "responderConfusionRate": 0.14,
+          "escalationInconsistencyRate": 0.1,
+          "panicMisuseRate": 0.08,
+          "fatigueAccumulationRate": 0.12,
+          "responderAbandonmentRate": 0.1,
+          "alertInterpretationDriftRate": 0.1
+        },
+        "governance": {
+          "p95InstitutionalDelayMinutes": 18,
+          "approvalBottleneckRate": 0.12,
+          "authorityAmbiguityRate": 0.1,
+          "supervisorDisagreementRate": 0.08,
+          "escalationDisputeRate": 0.08,
+          "accountabilityFrictionRate": 0.1
+        },
+        "incidentReviews": [
+          {
+            "replayReviewCompleted": true,
+            "governanceReviewCompleted": true,
+            "responderReviewCompleted": true,
+            "telecomReviewCompleted": true,
+            "confusionReviewCompleted": true,
+            "modelDivergenceReviewCompleted": true,
+            "uncertaintyReviewCompleted": true
+          }
+        ]
+      },
+      "expectedDecision": "limited-live-low-risk-observation"
+    }
+  ]
+}

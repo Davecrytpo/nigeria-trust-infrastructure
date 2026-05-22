@@ -1,0 +1,56 @@
+{
+  "generatedAt": "2026-05-22T00:44:36.377Z",
+  "evidenceDir": null,
+  "readiness": {
+    "status": "evidence-incomplete",
+    "blockers": [
+      "runtime validation has not passed on live containers",
+      "failure drills have not passed on live containers",
+      "mobile validation has not passed on a real device/emulator",
+      "live telecom provider validation has not passed",
+      "production environment validation has not passed"
+    ]
+  },
+  "summary": {
+    "runtimeValidation": "missing",
+    "failureDrills": "missing",
+    "mobileValidation": "failed",
+    "telecomValidation": "missing",
+    "productionEnvValidation": "failed",
+    "securityAudit": "passed",
+    "commandFailures": [],
+    "runtimeMeasurements": {},
+    "failureDrillCount": 0,
+    "mobileDevice": {
+      "id": "local-smoke",
+      "model": "not-connected",
+      "androidVersion": "unknown",
+      "batterySaver": false,
+      "networkProfile": "none"
+    },
+    "telecomProviders": []
+  },
+  "reports": {
+    "runtimeValidationReports": [],
+    "failureDrillReports": [],
+    "mobileReports": [
+      "reports\\mobile\\device-validation-2026-05-21T23-48-27-802Z.json"
+    ],
+    "telecomReports": [],
+    "productionEnvReports": [
+      "reports\\runtime\\production-env-validation-2026-05-22T00-25-06-541Z.json"
+    ],
+    "securityReports": [
+      "reports\\security\\security-audit-2026-05-22T00-43-40-552Z.json",
+      "reports\\security\\security-audit-2026-05-22T00-44-19-898Z.json"
+    ]
+  },
+  "requiredLiveProof": [
+    "runtime:validate on Docker-capable Linux host",
+    "runtime:failure-drills on Docker-capable Linux host",
+    "mobile:capture-validation from Android app-kill/reboot/offline replay tests",
+    "telecom provider sandbox/live receipt and failover evidence",
+    "Prometheus/Grafana scrape and dashboard evidence",
+    "security:audit evidence for session, RBAC, webhook, rate limit, and pilot controls"
+  ]
+}

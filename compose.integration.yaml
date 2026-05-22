@@ -1,0 +1,100 @@
+services:
+  migrate:
+    build:
+      context: .
+    environment:
+      DATABASE_URL: postgres://nigeria_trust:${POSTGRES_PASSWORD:-integration-password}@postgres:5432/nigeria_trust
+    command: ["node", "scripts/db/migrate.js"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  seed:
+    build:
+      context: .
+    environment:
+      DATABASE_URL: postgres://nigeria_trust:${POSTGRES_PASSWORD:-integration-password}@postgres:5432/nigeria_trust
+    command: ["node", "scripts/db/seed-operational-data.js"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  api:
+    build:
+      context: .
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3000
+      OPS_ACCESS_KEY: integration-ops-key
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://nigeria_trust:${POSTGRES_PASSWORD:-integration-password}@postgres:5432/nigeria_trust
+    ports:
+      - "3000:3000"
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  delivery-worker:
+    build:
+      context: .
+    environment:
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://nigeria_trust:${POSTGRES_PASSWORD:-integration-password}@postgres:5432/nigeria_trust
+      WORKER_ID: delivery-integration
+    command: ["node", "scripts/workers/delivery-worker.js"]
+    depends_on:
+      api:
+        condition: service_healthy
+
+  replay-worker:
+    build:
+      context: .
+    environment:
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://nigeria_trust:${POSTGRES_PASSWORD:-integration-password}@postgres:5432/nigeria_trust
+      WORKER_ID: replay-integration
+    command: ["node", "scripts/workers/replay-worker.js"]
+    depends_on:
+      api:
+        condition: service_healthy
+
+  operator-queue-worker:
+    build:
+      context: .
+    environment:
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://nigeria_trust:${POSTGRES_PASSWORD:-integration-password}@postgres:5432/nigeria_trust
+      WORKER_ID: operator-queue-integration
+    command: ["node", "scripts/workers/operator-queue-worker.js"]
+    depends_on:
+      api:
+        condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "PING"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  postgres:
+    image: postgis/postgis:16-3.4-alpine
+    environment:
+      POSTGRES_DB: nigeria_trust
+      POSTGRES_USER: nigeria_trust
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-integration-password}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nigeria_trust -d nigeria_trust"]
+      interval: 5s
+      timeout: 3s
+      retries: 10

@@ -1,0 +1,117 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate adaptive recovery behavior under repeated instability, oscillation, human uncertainty, and cross-layer propagation.",
+  "scenarios": [
+    {
+      "id": "oscillating-telecom-after-recovery",
+      "name": "Oscillating telecom after apparent recovery",
+      "convergenceScenario": {
+        "id": "oscillating-telecom-after-recovery",
+        "name": "Oscillating telecom after apparent recovery",
+        "signal": {
+          "telecomHealthScore": 0.7
+        },
+        "recoveryEvidence": {
+          "completedCheckpoints": ["telecom-health-stable", "receipt-confidence-window-closed"],
+          "stabilizationWindows": { "telecom-degraded": 35 },
+          "acknowledgments": { "operator-overload": true, "partial-db-recovery": true, "low-trust": true }
+        }
+      },
+      "adaptiveContext": {
+        "signal": {
+          "telecomHealthScore": 0.54,
+          "operatorLoadPerOperator": 6,
+          "queueReplayRate": 95
+        },
+        "history": {
+          "repeatedInstabilityCount": 5,
+          "recoveryRollbackCount": 2,
+          "oscillationCount": 4
+        },
+        "human": {
+          "fatigueRisk": 0.45,
+          "overconfidenceAfterRecovery": 0.5
+        }
+      },
+      "expectedAction": "continue-supervised-degraded-recovery"
+    },
+    {
+      "id": "replay-divergence-trust-spread",
+      "name": "Replay divergence spreading into trust uncertainty",
+      "convergenceScenario": {
+        "id": "replay-divergence-trust-spread",
+        "name": "Replay divergence spreading into trust uncertainty",
+        "signal": {
+          "dbWriteFailureRate": 0.06,
+          "replayDivergenceRate": 0.04,
+          "trustConfidenceScore": 0.68
+        },
+        "recoveryEvidence": {
+          "completedCheckpoints": [
+            "replay-divergence-resolved",
+            "canonical-timeline-checkpointed",
+            "trust-anomaly-reviewed",
+            "confidence-stabilized"
+          ],
+          "stabilizationWindows": {
+            "partial-db-recovery": 50,
+            "low-trust": 65
+          },
+          "acknowledgments": {
+            "partial-db-recovery": true,
+            "low-trust": true
+          }
+        }
+      },
+      "adaptiveContext": {
+        "signal": {
+          "replayDivergenceRate": 0.05,
+          "unreconciledIncidentRate": 0.16,
+          "queueReplayRate": 135,
+          "trustConfidenceScore": 0.64
+        },
+        "history": {
+          "chronicReplayDivergenceCount": 4,
+          "trustVolatilityCount": 3,
+          "recoveryRollbackCount": 1
+        },
+        "human": {
+          "situationalConfusion": 0.55,
+          "escalationReluctance": 0.4
+        }
+      },
+      "expectedAction": "persist-degraded-or-rollback"
+    },
+    {
+      "id": "safe-partial-recovery-under-watch",
+      "name": "Safe partial recovery under supervisor watch",
+      "convergenceScenario": {
+        "id": "safe-partial-recovery-under-watch",
+        "name": "Safe partial recovery under supervisor watch",
+        "signal": {
+          "telecomHealthScore": 0.7
+        },
+        "recoveryEvidence": {
+          "completedCheckpoints": ["telecom-health-stable", "receipt-confidence-window-closed"],
+          "stabilizationWindows": { "telecom-degraded": 35 },
+          "acknowledgments": { "operator-overload": true, "partial-db-recovery": true, "low-trust": true }
+        }
+      },
+      "adaptiveContext": {
+        "signal": {
+          "telecomHealthScore": 0.77,
+          "operatorLoadPerOperator": 5
+        },
+        "history": {
+          "repeatedInstabilityCount": 1,
+          "recoveryRollbackCount": 1
+        },
+        "human": {
+          "fatigueRisk": 0.2
+        }
+      },
+      "expectedAction": "safe-partial-recovery"
+    }
+  ]
+}

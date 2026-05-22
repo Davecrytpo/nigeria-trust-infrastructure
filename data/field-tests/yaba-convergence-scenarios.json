@@ -1,0 +1,211 @@
+{
+  "version": "2026-05-21",
+  "pilotZone": "Yaba, Lagos",
+  "purpose": "Validate cross-system recovery when concrete operational execution controls are active under compound degradation.",
+  "scenarios": [
+    {
+      "id": "telecom-degraded-operator-overload",
+      "name": "Telecom degradation plus operator overload",
+      "signal": {
+        "telecomHealthScore": 0.64,
+        "appConnectivityRate": 0.7,
+        "smsAvailabilityRate": 0.6,
+        "operatorLoadPerOperator": 9,
+        "activeIncidents": 16,
+        "availableResponders": 14,
+        "trustConfidenceScore": 0.82,
+        "operationalControls": {
+          "smsProviderFailover": true,
+          "telecomHealthMonitor": true,
+          "operatorAutoscaling": true,
+          "operatorQueuePartitioning": true,
+          "trustContainmentReview": true
+        }
+      },
+      "recoveryEvidence": {
+        "completedCheckpoints": ["telecom-health-stable", "receipt-confidence-window-closed", "operator-load-normal", "supervisor-acknowledged-recovery"],
+        "stabilizationWindows": {
+          "telecom-degraded": 35,
+          "operator-overload": 35
+        },
+        "acknowledgments": {
+          "telecom-degraded": true,
+          "operator-overload": true,
+          "supervisor": true
+        }
+      }
+    },
+    {
+      "id": "regional-isolation-trust-attack",
+      "name": "Regional isolation plus trust attack",
+      "signal": {
+        "telecomHealthScore": 0.66,
+        "regionalBackhaulDown": true,
+        "trustConfidenceScore": 0.42,
+        "operatorLoadPerOperator": 4,
+        "activeIncidents": 10,
+        "availableResponders": 12,
+        "operationalControls": {
+          "multiRegionBackhaul": true,
+          "smsProviderFailover": true,
+          "telecomHealthMonitor": true,
+          "trustContainmentReview": true,
+          "incidentMergeReview": true
+        }
+      },
+      "recoveryEvidence": {
+        "completedCheckpoints": ["backhaul-restored", "regional-queue-reconciled", "trust-anomaly-reviewed", "confidence-stabilized"],
+        "stabilizationWindows": {
+          "regional-isolation": 70,
+          "low-trust": 70
+        },
+        "acknowledgments": {
+          "regional-isolation": true,
+          "low-trust": true,
+          "supervisor": true
+        }
+      }
+    },
+    {
+      "id": "sms-only-replay-corruption",
+      "name": "SMS-only mode plus replay corruption",
+      "signal": {
+        "telecomHealthScore": 0.7,
+        "appConnectivityRate": 0.18,
+        "smsAvailabilityRate": 0.76,
+        "dbWriteFailureRate": 0.09,
+        "replayDivergenceRate": 0.07,
+        "queueReplayRate": 180,
+        "operatorLoadPerOperator": 5,
+        "activeIncidents": 8,
+        "availableResponders": 9,
+        "operationalControls": {
+          "edgeRetryRouting": true,
+          "smsProviderFailover": true,
+          "telecomHealthMonitor": true,
+          "replayReconciliation": true,
+          "queueReplayDrain": true,
+          "operatorQueuePartitioning": true,
+          "trustContainmentReview": true
+        }
+      },
+      "recoveryEvidence": {
+        "completedCheckpoints": ["app-connectivity-restored", "sms-backlog-reconciled", "replay-divergence-resolved", "canonical-timeline-checkpointed"],
+        "stabilizationWindows": {
+          "sms-only": 25,
+          "partial-db-recovery": 50
+        },
+        "acknowledgments": {
+          "partial-db-recovery": true,
+          "sms-only": true,
+          "supervisor": true
+        }
+      }
+    },
+    {
+      "id": "disaster-surge-responder-scarcity",
+      "name": "Disaster surge plus responder scarcity",
+      "signal": {
+        "telecomHealthScore": 0.72,
+        "operatorLoadPerOperator": 11,
+        "activeIncidents": 42,
+        "availableResponders": 12,
+        "disasterSignals": 3,
+        "trustConfidenceScore": 0.8,
+        "operationalControls": {
+          "smsProviderFailover": true,
+          "telecomHealthMonitor": true,
+          "operatorAutoscaling": true,
+          "operatorQueuePartitioning": true,
+          "responderRegionalBalancing": true,
+          "trustContainmentReview": true
+        }
+      },
+      "recoveryEvidence": {
+        "completedCheckpoints": [
+          "incident-rate-stable",
+          "cluster-review-complete",
+          "institutional-capacity-confirmed",
+          "operator-load-normal",
+          "supervisor-acknowledged-recovery",
+          "responder-coverage-restored",
+          "critical-queue-cleared"
+        ],
+        "stabilizationWindows": {
+          "disaster-surge": 95,
+          "operator-overload": 35,
+          "responder-scarcity": 50
+        },
+        "acknowledgments": {
+          "disaster-surge": true,
+          "operator-overload": true,
+          "supervisor": true
+        }
+      }
+    },
+    {
+      "id": "controlled-recovery-after-compound-failure",
+      "name": "Controlled recovery after compound failure",
+      "signal": {
+        "telecomHealthScore": 0.71,
+        "appConnectivityRate": 0.28,
+        "smsAvailabilityRate": 0.8,
+        "trustConfidenceScore": 0.62,
+        "operatorLoadPerOperator": 7,
+        "activeIncidents": 14,
+        "availableResponders": 8,
+        "dbWriteFailureRate": 0.06,
+        "replayDivergenceRate": 0.025,
+        "queueReplayRate": 120,
+        "regionalBackhaulDown": true,
+        "operationalControls": {
+          "multiRegionBackhaul": true,
+          "edgeRetryRouting": true,
+          "smsProviderFailover": true,
+          "telecomHealthMonitor": true,
+          "trustContainmentReview": true,
+          "operatorAutoscaling": true,
+          "operatorQueuePartitioning": true,
+          "responderRegionalBalancing": true,
+          "replayReconciliation": true,
+          "queueReplayDrain": true,
+          "incidentMergeReview": true
+        }
+      },
+      "recoveryEvidence": {
+        "completedCheckpoints": [
+          "replay-divergence-resolved",
+          "canonical-timeline-checkpointed",
+          "backhaul-restored",
+          "regional-queue-reconciled",
+          "telecom-health-stable",
+          "receipt-confidence-window-closed",
+          "app-connectivity-restored",
+          "sms-backlog-reconciled",
+          "trust-anomaly-reviewed",
+          "confidence-stabilized",
+          "operator-load-normal",
+          "supervisor-acknowledged-recovery",
+          "responder-coverage-restored",
+          "critical-queue-cleared"
+        ],
+        "stabilizationWindows": {
+          "partial-db-recovery": 60,
+          "regional-isolation": 75,
+          "telecom-degraded": 45,
+          "sms-only": 30,
+          "low-trust": 90,
+          "operator-overload": 45,
+          "responder-scarcity": 60
+        },
+        "acknowledgments": {
+          "partial-db-recovery": true,
+          "regional-isolation": true,
+          "low-trust": true,
+          "operator-overload": true,
+          "supervisor": true
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "receipts": [
+    {
+      "id": "rcpt-mpfydxnr-q22pjp",
+      "provider": "twilio",
+      "providerMessageId": "SM123",
+      "status": "delivered",
+      "to": "+2348012345678",
+      "latencyMs": null,
+      "raw": {
+        "MessageSid": "SM123",
+        "MessageStatus": "delivered",
+        "To": "+2348012345678"
+      },
+      "receivedAt": "2026-05-21T20:38:38.247Z",
+      "duplicateCount": 3,
+      "lastDuplicateAt": "2026-05-21T20:39:48.253Z"
+    }
+  ]
+}
