@@ -14,8 +14,7 @@ const state = {
   operatorRef: window.localStorage.getItem("operatorRef") ?? "browser-operator",
   events: null,
   presenceTimer: null,
-  loading: false
-  ,
+  loading: false,
   filter: "active",
   selectedIncidentId: null,
   replayEvents: [],
@@ -24,12 +23,15 @@ const state = {
   supervisorOverrides: new Set(),
   auditFeed: [],
   mapOverlay: "incidents",
-  presentationMode: true,
+  presentationMode: false,
+  focusMode: true,
   syncState: "connecting",
   staleSnapshotsIgnored: 0,
   lastSnapshotAt: null,
   sseReconnects: 0
 };
+
+const focusLimit = (items, limit) => state.focusMode ? items.slice(0, limit) : items;
 
 const cssEscape = (value) => String(value ?? "")
   .replaceAll("&", "&amp;")
@@ -221,8 +223,8 @@ function renderCommandMap(incidents, responders, activeDisasterMode, infrastruct
       <div class="map-road road-a"></div>
       <div class="map-road road-b"></div>
       <div class="map-road road-c"></div>
-      ${state.mapOverlay === "incidents" ? incidents.slice(0, 12).map(renderMapIncident).join("") : ""}
-      ${state.mapOverlay === "responders" ? responders.slice(0, 12).map(renderResponderMarker).join("") : ""}
+      ${state.mapOverlay === "incidents" ? incidents.slice(0, state.focusMode ? 8 : 12).map(renderMapIncident).join("") : ""}
+      ${state.mapOverlay === "responders" ? responders.slice(0, state.focusMode ? 8 : 12).map(renderResponderMarker).join("") : ""}
       ${state.mapOverlay === "clusters" ? renderIncidentClusters(incidents) : ""}
       ${state.mapOverlay === "disaster" ? `<div class="disaster-band">Disaster coordination overlay active</div>` : ""}
       ${telecomOutage ? `<div class="telecom-band">Telecom degradation visible</div>` : ""}
@@ -472,6 +474,27 @@ function renderDashboard() {
   const { metrics, incidents, responders, trustQueue, operatorQueue = [], presence = [], infrastructure = {}, neighborhood, generatedAt } = state.dashboard;
   const activeDisasterMode = infrastructure.disasterMode ?? metrics.criticalIncidents > 1;
   const visibleIncidents = filterIncidents(incidents);
+  const displayIncidents = focusLimit(visibleIncidents, 6);
+  const displayResponders = focusLimit(responders, 5);
+  const displayTrustQueue = focusLimit(trustQueue, 4);
+  const displayOperatorQueue = focusLimit(operatorQueue, 5);
+  const displayPresence = focusLimit(presence, 4);
+  const focusedStats = state.focusMode
+    ? [
+        ["Active incidents", metrics.activeIncidents, ""],
+        ["Critical incidents", metrics.criticalIncidents, "critical"],
+        ["Available responders", metrics.availableResponders, ""],
+        ["Delivery queued", infrastructure.queued ?? 0, ""]
+      ]
+    : [
+        ["Total incidents", metrics.totalIncidents, ""],
+        ["Active incidents", metrics.activeIncidents, ""],
+        ["Critical incidents", metrics.criticalIncidents, "critical"],
+        ["Available responders", metrics.availableResponders, ""],
+        ["Engaged responders", metrics.engagedResponders, ""],
+        ["Delivery queued", infrastructure.queued ?? 0, ""],
+        ["Live presence", presence.length, ""]
+      ];
 
   app.innerHTML = `
     <main class="ops-layout">
@@ -500,6 +523,8 @@ function renderDashboard() {
             <div class="action-row">
               <button class="primary-button" data-refresh>Refresh board</button>
               <button class="secondary-button" data-claim-queue>Claim next</button>
+              <button class="secondary-button" data-toggle-focus>${state.focusMode ? "Full board" : "Focus mode"}</button>
+              <button class="secondary-button" data-toggle-presentation>${state.presentationMode ? "Hide guide" : "Demo guide"}</button>
               <button class="secondary-button" data-simulate-degraded>Mark degraded mode</button>
               <button class="secondary-button" data-logout>Clear access key</button>
             </div>
@@ -514,27 +539,26 @@ function renderDashboard() {
         ${renderSyncConfidenceStrip(generatedAt)}
 
         <section class="grid stats" aria-label="Operational metrics">
-          <article class="stat-card"><span>Total incidents</span><strong>${cssEscape(metrics.totalIncidents)}</strong></article>
-          <article class="stat-card"><span>Active incidents</span><strong>${cssEscape(metrics.activeIncidents)}</strong></article>
-          <article class="stat-card critical"><span>Critical incidents</span><strong>${cssEscape(metrics.criticalIncidents)}</strong></article>
-          <article class="stat-card"><span>Available responders</span><strong>${cssEscape(metrics.availableResponders)}</strong></article>
-          <article class="stat-card"><span>Engaged responders</span><strong>${cssEscape(metrics.engagedResponders)}</strong></article>
-          <article class="stat-card"><span>Delivery queued</span><strong>${cssEscape(infrastructure.queued ?? 0)}</strong></article>
-          <article class="stat-card"><span>Live presence</span><strong>${cssEscape(presence.length)}</strong></article>
+          ${focusedStats.map(([label, value, className]) => `
+            <article class="stat-card ${className}">
+              <span>${cssEscape(label)}</span>
+              <strong>${cssEscape(value)}</strong>
+            </article>
+          `).join("")}
         </section>
 
-        <section class="grid">
+        <section class="grid ${state.focusMode ? "focus-grid" : ""}">
           <section class="panel wide" id="queue">
             <div class="panel-header">
               <div>
                 <span class="panel-kicker">Next actions</span>
                 <h2>Incident queue</h2>
               </div>
-              <span class="state-chip">${cssEscape(visibleIncidents.length)} shown</span>
+              <span class="state-chip">${cssEscape(displayIncidents.length)} of ${cssEscape(visibleIncidents.length)}</span>
             </div>
             ${renderFilters()}
             <div class="table-list priority-list">
-              ${visibleIncidents.length ? visibleIncidents.map(renderIncidentRow).join("") : `<div class="empty">No incidents match this filter.</div>`}
+              ${displayIncidents.length ? displayIncidents.map(renderIncidentRow).join("") : `<div class="empty">No incidents match this filter.</div>`}
             </div>
           </section>
 
@@ -546,7 +570,7 @@ function renderDashboard() {
               </div>
               <span class="state-chip">${cssEscape(state.mapOverlay)}</span>
             </div>
-            ${renderCommandMap(visibleIncidents, responders, activeDisasterMode, infrastructure)}
+            ${renderCommandMap(displayIncidents, displayResponders, activeDisasterMode, infrastructure)}
           </section>
 
           <section class="panel narrow">
@@ -560,9 +584,10 @@ function renderDashboard() {
                 <h3>Responder network</h3>
               </div>
             </div>
-            <div class="table-list">${responders.map(renderResponderRow).join("")}</div>
+            <div class="table-list">${displayResponders.map(renderResponderRow).join("")}</div>
           </section>
 
+          ${state.focusMode ? "" : `
           <section class="panel narrow">
             <div class="panel-header">
               <div>
@@ -571,9 +596,10 @@ function renderDashboard() {
               </div>
             </div>
             <div class="table-list">
-              ${trustQueue.length ? trustQueue.map(renderTrustRow).join("") : `<div class="empty">Trust queue is clear.</div>`}
+              ${displayTrustQueue.length ? displayTrustQueue.map(renderTrustRow).join("") : `<div class="empty">Trust queue is clear.</div>`}
             </div>
           </section>
+          `}
 
           <section class="panel narrow" id="telecom">
             <div class="panel-header">
@@ -588,6 +614,7 @@ function renderDashboard() {
             </div>
           </section>
 
+          ${state.focusMode ? "" : `
           <section class="panel narrow">
             <div class="panel-header">
               <div>
@@ -616,9 +643,10 @@ function renderDashboard() {
               </div>
             </div>
             <div class="table-list">
-              ${presence.length ? presence.map(renderPresenceRow).join("") : `<div class="empty">No active operator presence.</div>`}
+              ${displayPresence.length ? displayPresence.map(renderPresenceRow).join("") : `<div class="empty">No active operator presence.</div>`}
             </div>
           </section>
+          `}
 
           <section class="panel wide" id="audit">
             <div class="panel-header">
@@ -628,9 +656,10 @@ function renderDashboard() {
               </div>
             </div>
             <div class="timeline-list">${renderLoadedReplay()}</div>
-            <div class="timeline-list secondary-timeline">${renderAuditTimeline(incidents, operatorQueue)}</div>
+            <div class="timeline-list secondary-timeline">${renderAuditTimeline(displayIncidents, displayOperatorQueue)}</div>
           </section>
 
+          ${state.focusMode ? "" : `
           <section class="panel wide">
             <div class="panel-header">
               <div>
@@ -650,9 +679,10 @@ function renderDashboard() {
               </div>
             </div>
             <div class="table-list">
-              ${operatorQueue.length ? operatorQueue.map(renderOperatorQueueRow).join("") : `<div class="empty">Operator queue is clear.</div>`}
+              ${displayOperatorQueue.length ? displayOperatorQueue.map(renderOperatorQueueRow).join("") : `<div class="empty">Operator queue is clear.</div>`}
             </div>
           </section>
+          `}
         </section>
       </section>
     </main>
@@ -948,6 +978,13 @@ app.addEventListener("click", async (event) => {
     if (target.matches("[data-toggle-presentation]")) {
       state.presentationMode = !state.presentationMode;
       addAudit("presentation guide toggled", { enabled: state.presentationMode });
+      render();
+      return;
+    }
+
+    if (target.matches("[data-toggle-focus]")) {
+      state.focusMode = !state.focusMode;
+      addAudit("operator focus mode toggled", { enabled: state.focusMode });
       render();
       return;
     }

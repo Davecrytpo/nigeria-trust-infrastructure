@@ -185,41 +185,172 @@ class CalmSosButton extends StatelessWidget {
     super.key,
     required this.progress,
     required this.silent,
-    required this.onPressed,
+    required this.onHoldStart,
+    required this.onHoldEnd,
+    this.lowResourceMode = false,
   });
 
   final int progress;
   final bool silent;
-  final VoidCallback onPressed;
+  final VoidCallback onHoldStart;
+  final VoidCallback onHoldEnd;
+  final bool lowResourceMode;
 
   @override
   Widget build(BuildContext context) {
     final tone = silent ? EmergencyTone.warning : EmergencyTone.critical;
     final color = emergencyToneColor(tone);
+    final secondsLeft = (3 - progress).clamp(0, 3);
     return SizedBox(
       height: 232,
-      child: DecoratedBox(
+      child: Semantics(
+        button: true,
+        label: silent ? 'Silent emergency help. Hold for three seconds.' : 'Emergency SOS. Hold for three seconds.',
+        hint: 'Keep your finger on the button until the progress bar completes.',
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTapDown: (_) => onHoldStart(),
+          onTapUp: (_) => onHoldEnd(),
+          onTapCancel: onHoldEnd,
+          child: AnimatedContainer(
+            duration: lowResourceMode ? Duration.zero : ResidentEmergencyTheme.motionFast,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(ResidentEmergencyTheme.radius),
+              boxShadow: lowResourceMode
+                  ? null
+                  : [
+                      BoxShadow(color: color.withOpacity(0.28), blurRadius: 24, offset: const Offset(0, 14)),
+                    ],
+            ),
+            padding: const EdgeInsets.all(ResidentEmergencyTheme.space5),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.emergency_share, size: lowResourceMode ? 50 : 56, color: silent ? ResidentEmergencyTheme.charcoal : ResidentEmergencyTheme.text),
+                const SizedBox(height: ResidentEmergencyTheme.space3),
+                Text(
+                  silent ? 'HOLD' : 'SOS',
+                  style: Theme.of(context).textTheme.displayLarge?.copyWith(color: silent ? ResidentEmergencyTheme.charcoal : ResidentEmergencyTheme.text),
+                ),
+                const SizedBox(height: ResidentEmergencyTheme.space1),
+                Text(
+                  progress == 0 ? 'Hold for help' : secondsLeft == 0 ? 'Sending now' : 'Keep holding ${secondsLeft}s',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(color: silent ? ResidentEmergencyTheme.charcoal : ResidentEmergencyTheme.text),
+                ),
+                const SizedBox(height: ResidentEmergencyTheme.space3),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(3, (index) {
+                    final active = progress > index;
+                    return AnimatedContainer(
+                      duration: lowResourceMode ? Duration.zero : ResidentEmergencyTheme.motionFast,
+                      width: active ? 28 : 18,
+                      height: 8,
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      decoration: BoxDecoration(
+                        color: (silent ? ResidentEmergencyTheme.charcoal : ResidentEmergencyTheme.text).withOpacity(active ? 0.95 : 0.36),
+                        borderRadius: BorderRadius.circular(ResidentEmergencyTheme.radius),
+                      ),
+                    );
+                  }),
+                ),
+                const SizedBox(height: ResidentEmergencyTheme.space2),
+                Text(
+                  progress == 0 ? 'Release before 3s to cancel' : 'Do not lift your finger',
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(color: silent ? ResidentEmergencyTheme.charcoal : ResidentEmergencyTheme.text),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class EmergencyCompactAction extends StatelessWidget {
+  const EmergencyCompactAction({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.tone = EmergencyTone.calm,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final EmergencyTone tone;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = emergencyToneColor(tone);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(ResidentEmergencyTheme.radius),
+      child: Container(
+        minHeight: ResidentEmergencyTheme.minTapTarget,
+        padding: const EdgeInsets.symmetric(horizontal: ResidentEmergencyTheme.space3, vertical: ResidentEmergencyTheme.space2),
         decoration: BoxDecoration(
+          color: color.withOpacity(0.14),
           borderRadius: BorderRadius.circular(ResidentEmergencyTheme.radius),
-          boxShadow: [
-            BoxShadow(color: color.withOpacity(0.28), blurRadius: 24, offset: const Offset(0, 14)),
+          border: Border.all(color: color.withOpacity(0.45)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color, size: 20),
+            const SizedBox(width: ResidentEmergencyTheme.space2),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+            ),
           ],
         ),
-        child: FilledButton(
-          onPressed: onPressed,
-          style: FilledButton.styleFrom(
-            backgroundColor: color,
-            foregroundColor: silent ? ResidentEmergencyTheme.charcoal : ResidentEmergencyTheme.text,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(ResidentEmergencyTheme.radius)),
+      ),
+    );
+  }
+}
+
+class EmergencySegmentButton extends StatelessWidget {
+  const EmergencySegmentButton({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(ResidentEmergencyTheme.radius),
+        child: Container(
+          minHeight: 64,
+          padding: const EdgeInsets.symmetric(horizontal: ResidentEmergencyTheme.space2, vertical: ResidentEmergencyTheme.space3),
+          decoration: BoxDecoration(
+            color: selected ? ResidentEmergencyTheme.deepGreen : ResidentEmergencyTheme.surfaceRaised,
+            borderRadius: BorderRadius.circular(ResidentEmergencyTheme.radius),
+            border: Border.all(color: selected ? ResidentEmergencyTheme.deepGreen : ResidentEmergencyTheme.line),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.emergency_share, size: 56),
-              const SizedBox(height: ResidentEmergencyTheme.space3),
-              Text('SOS', style: Theme.of(context).textTheme.displayLarge),
+              Icon(icon, size: 22, color: ResidentEmergencyTheme.text),
               const SizedBox(height: ResidentEmergencyTheme.space1),
-              Text(progress == 0 ? 'Hold for help' : 'Hold ${3 - progress}s', style: Theme.of(context).textTheme.titleMedium),
+              Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: ResidentEmergencyTheme.text)),
             ],
           ),
         ),

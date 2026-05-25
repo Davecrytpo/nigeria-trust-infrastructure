@@ -51,6 +51,13 @@
     "evidence:package": "node scripts/integration/package-evidence.js",
     "evidence:hash": "node scripts/integration/hash-evidence.js",
     "mobile:capture-validation": "node scripts/mobile/capture-device-validation.js",
+    "mobile:setup:print": "powershell -ExecutionPolicy Bypass -File scripts/mobile/print-low-spec-android-setup.ps1",
+    "mobile:toolchain": "powershell -ExecutionPolicy Bypass -File scripts/mobile/check-android-toolchain.ps1",
+    "mobile:usb-apk": "powershell -ExecutionPolicy Bypass -File scripts/mobile/build-usb-apk.ps1",
+    "mobile:usb-apk:fast": "powershell -ExecutionPolicy Bypass -File scripts/mobile/build-usb-apk.ps1 -Mode debug -Install -SkipTests",
+    "mobile:usb-apk:profile": "powershell -ExecutionPolicy Bypass -File scripts/mobile/build-usb-apk.ps1 -Mode profile -Install -SkipTests",
+    "mobile:usb-apk:release": "powershell -ExecutionPolicy Bypass -File scripts/mobile/build-usb-apk.ps1 -Mode release",
+    "mobile:usb-apk:size": "powershell -ExecutionPolicy Bypass -File scripts/mobile/build-usb-apk.ps1 -Mode release -AnalyzeSize -SkipTests",
     "test": "node --test services/api-prototype/src/server.test.js services/api-prototype/src/adversarial.test.js"
   },
   "engines": {

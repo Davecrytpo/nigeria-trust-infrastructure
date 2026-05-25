@@ -1,0 +1,1 @@
+flutter is not available on PATH. Install it before APK generation.

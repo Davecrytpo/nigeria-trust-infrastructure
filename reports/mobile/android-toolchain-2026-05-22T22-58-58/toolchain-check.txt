@@ -1,0 +1,8 @@
+[2026-05-22T22:58:58.4515527+01:00] flutter missing from PATH
+[2026-05-22T22:58:58.5348886+01:00] adb found at C:\adb\platform-tools-latest-windows\platform-tools\adb.exe
+[2026-05-22T22:58:58.5454807+01:00] java found at C:\Program Files\Eclipse Adoptium\jdk-17.0.18.8-hotspot\bin\java.exe
+[2026-05-22T22:58:58.6336964+01:00] sdkmanager missing from PATH
+[2026-05-22T22:58:59.8211365+01:00] java-version: ok
+[2026-05-22T22:59:00.4469320+01:00] adb-version: ok
+[2026-05-22T22:59:00.9727368+01:00] adb-devices: ok
+[2026-05-22T22:59:01.2710539+01:00] not ready for APK generation

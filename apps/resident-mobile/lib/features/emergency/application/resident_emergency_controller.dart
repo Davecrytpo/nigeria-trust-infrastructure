@@ -10,6 +10,7 @@ class ResidentEmergencyController extends ChangeNotifier {
   bool silentPanicArmed = false;
   bool onboardingComplete = false;
   bool pilotDemoMode = true;
+  bool lowResourceMode = true;
   String syncMessage = 'Offline queue protected';
   int batteryPercent = 12;
 
@@ -105,6 +106,11 @@ class ResidentEmergencyController extends ChangeNotifier {
 
   void setPilotDemoMode(bool value) {
     pilotDemoMode = value;
+    notifyListeners();
+  }
+
+  void setLowResourceMode(bool value) {
+    lowResourceMode = value;
     notifyListeners();
   }
 

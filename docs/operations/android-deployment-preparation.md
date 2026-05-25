@@ -2,6 +2,66 @@
 
 This document prepares physical-device validation. It does not claim Android readiness.
 
+## Lightweight Physical-Device Build Flow
+
+For 4GB RAM machines, prefer a physical USB Android phone and the command-line Android SDK. Do not require Android Studio or an emulator for the first pilot pass.
+
+```powershell
+npm run mobile:toolchain
+adb devices
+npm run mobile:usb-apk:fast
+```
+
+If the first phone threshold is blocked only by local test runtime on a low-spec laptop, use:
+
+```powershell
+.\scripts\mobile\build-usb-apk.ps1 -Mode debug -Install -SkipTests
+```
+
+Then rerun without `-SkipTests` before promoting any APK beyond local USB validation.
+
+Use profile mode for real-device startup and memory evidence:
+
+```powershell
+npm run mobile:usb-apk:profile
+```
+
+Use release mode only for a pilot candidate:
+
+```powershell
+npm run mobile:usb-apk:release
+```
+
+Use size mode before sending a pilot APK outside the build machine:
+
+```powershell
+npm run mobile:usb-apk:size
+```
+
+The script generates the Android host project if missing, runs `flutter pub get`, `flutter analyze` unless skipped, runs `flutter test` unless skipped, builds the APK, hashes the APK, installs it when requested, measures startup through `adb shell am start -W`, captures a screenshot, and stores runtime evidence under `reports/mobile`.
+
+The latest USB APK evidence directory is written to:
+
+```text
+reports/mobile/latest-usb-apk-dir.txt
+```
+
+Required first-pass evidence:
+
+- `apk-files.txt`
+- `apk-sha256.txt`
+- `adb-install.txt`
+- `adb-startup-time.txt`
+- `adb-resume-startup-time.txt`
+- `launch-screenshot.png`
+- `resume-screenshot.png`
+- `logcat-tail.txt`
+- `battery.txt`
+- `connectivity.txt`
+- `meminfo.txt`
+- `meminfo-after-resume.txt`
+- `gfxinfo.txt`
+
 ## Signed APK Build Flow
 
 1. Confirm Flutter SDK and Android SDK are installed on the build machine.
@@ -48,7 +108,7 @@ Minimum emulator profiles:
 ```bash
 adb devices
 adb install -r apps/resident-mobile/build/app/outputs/flutter-apk/app-release.apk
-adb shell monkey -p com.example.resident_mobile 1
+adb shell am start -W -n com.example.resident_mobile/.MainActivity
 ```
 
 Replace package name with the final Android application ID after the host Android project is generated.

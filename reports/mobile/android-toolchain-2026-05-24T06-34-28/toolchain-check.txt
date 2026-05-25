@@ -1,0 +1,9 @@
+[2026-05-24T06:34:29.1750501+01:00] flutter missing from PATH
+[2026-05-24T06:34:29.3572069+01:00] adb found at C:\adb\platform-tools-latest-windows\platform-tools\adb.exe
+[2026-05-24T06:34:39.3740173+01:00] java found at C:\Program Files\Eclipse Adoptium\jdk-17.0.18.8-hotspot\bin\java.exe
+[2026-05-24T06:34:39.5908393+01:00] sdkmanager missing from PATH
+[2026-05-24T06:34:39.6631217+01:00] ANDROID_HOME or ANDROID_SDK_ROOT missing; set it to the command-line SDK path
+[2026-05-24T06:34:41.7367490+01:00] java-version: ok
+[2026-05-24T06:34:43.1629458+01:00] adb-version: ok
+[2026-05-24T06:34:44.6592773+01:00] adb-devices: ok
+[2026-05-24T06:34:45.6646339+01:00] not ready for APK generation with command-line Android SDK

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
 class ResidentEmergencyTheme {
-  static const deepGreen = Color(0xFF0B6B3A);
-  static const amber = Color(0xFFD4A017);
+  static const deepGreen = Color(0xFF047A46);
+  static const amber = Color(0xFFC6A15B);
   static const charcoal = Color(0xFF121212);
-  static const graphite = Color(0xFF171B18);
-  static const surface = Color(0xFF1E2421);
-  static const surfaceRaised = Color(0xFF26302B);
+  static const graphite = Color(0xFF151B18);
+  static const surface = Color(0xFF1B2420);
+  static const surfaceRaised = Color(0xFF24312B);
   static const text = Color(0xFFE8F0EA);
   static const mutedText = Color(0xFFAAB7AE);
-  static const danger = Color(0xFFD64545);
-  static const warning = Color(0xFFD98E04);
+  static const danger = Color(0xFFB84A4A);
+  static const warning = Color(0xFFC58B22);
   static const offline = Color(0xFF58636B);
-  static const recovery = Color(0xFF2C9B63);
+  static const recovery = Color(0xFF2A9D64);
   static const line = Color(0xFF34413A);
 
   static const double space1 = 4;

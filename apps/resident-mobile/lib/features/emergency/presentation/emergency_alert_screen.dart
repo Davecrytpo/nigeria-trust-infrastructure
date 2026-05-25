@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:resident_mobile/core/presentation/emergency_components.dart';
 import 'package:resident_mobile/core/presentation/resident_emergency_theme.dart';
 import 'package:resident_mobile/features/emergency/application/resident_emergency_controller.dart';
@@ -18,6 +21,7 @@ class _EmergencyAlertScreenState extends State<EmergencyAlertScreen> {
   final ResidentEmergencyController _controller = ResidentEmergencyController();
   ResidentTab _tab = ResidentTab.sos;
   int _holdProgress = 0;
+  Timer? _holdTimer;
 
   ResidentCopy get _copy => ResidentCopy(_controller.language);
 
@@ -29,6 +33,7 @@ class _EmergencyAlertScreenState extends State<EmergencyAlertScreen> {
 
   @override
   void dispose() {
+    _holdTimer?.cancel();
     _controller.removeListener(_refresh);
     _controller.dispose();
     super.dispose();
@@ -39,7 +44,7 @@ class _EmergencyAlertScreenState extends State<EmergencyAlertScreen> {
   @override
   Widget build(BuildContext context) {
     final scale = _controller.accessibilityMode ? 1.16 : 1.0;
-    final motionEnabled = !_controller.accessibilityMode;
+    final motionEnabled = !_controller.accessibilityMode && !_controller.lowResourceMode;
 
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(textScaleFactor: scale),
@@ -77,15 +82,30 @@ class _EmergencyAlertScreenState extends State<EmergencyAlertScreen> {
           bottomNavigationBar: NavigationBar(
             selectedIndex: ResidentTab.values.indexOf(_tab),
             onDestinationSelected: (index) => setState(() => _tab = ResidentTab.values[index]),
+            height: _controller.accessibilityMode ? 76 : 68,
             destinations: const [
               NavigationDestination(icon: Icon(Icons.emergency_share), label: 'SOS'),
               NavigationDestination(icon: Icon(Icons.group), label: 'Contacts'),
               NavigationDestination(icon: Icon(Icons.cloud_sync), label: 'Queue'),
               NavigationDestination(icon: Icon(Icons.receipt_long), label: 'History'),
-              NavigationDestination(icon: Icon(Icons.route), label: 'Track'),
+              NavigationDestination(icon: Icon(Icons.route), label: 'Map'),
               NavigationDestination(icon: Icon(Icons.tune), label: 'Mode'),
             ],
           ),
+          floatingActionButton: _controller.onboardingComplete && _tab != ResidentTab.sos
+              ? FloatingActionButton.extended(
+                  heroTag: 'quick-sos',
+                  backgroundColor: ResidentEmergencyTheme.danger,
+                  foregroundColor: ResidentEmergencyTheme.text,
+                  onPressed: () {
+                    HapticFeedback.selectionClick();
+                    setState(() => _tab = ResidentTab.sos);
+                  },
+                  icon: const Icon(Icons.emergency_share),
+                  label: const Text('SOS'),
+                )
+              : null,
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         ),
       ),
     );
@@ -97,7 +117,8 @@ class _EmergencyAlertScreenState extends State<EmergencyAlertScreen> {
         return _SosView(
           controller: _controller,
           holdProgress: _holdProgress,
-          onHold: _handleHold,
+          onHoldStart: _startSosHold,
+          onHoldEnd: _cancelSosHold,
           onCancel: _showCancelSheet,
         );
       case ResidentTab.contacts:
@@ -113,16 +134,41 @@ class _EmergencyAlertScreenState extends State<EmergencyAlertScreen> {
     }
   }
 
-  void _handleHold() {
-    setState(() => _holdProgress = (_holdProgress + 1).clamp(0, 3).toInt());
-    if (_holdProgress >= 3) {
+  void _startSosHold() {
+    _holdTimer?.cancel();
+    HapticFeedback.selectionClick();
+    setState(() => _holdProgress = 0);
+    _holdTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
+      setState(() => _holdProgress = (_holdProgress + 1).clamp(0, 3).toInt());
+      HapticFeedback.selectionClick();
+      if (_holdProgress >= 3) {
+        timer.cancel();
+        _activateSos();
+      }
+    });
+  }
+
+  void _cancelSosHold() {
+    if (_holdProgress >= 3) return;
+    _holdTimer?.cancel();
+    if (_holdProgress > 0) {
+      HapticFeedback.lightImpact();
+    }
+    setState(() => _holdProgress = 0);
+  }
+
+  void _activateSos() {
+    _holdTimer?.cancel();
+    HapticFeedback.heavyImpact();
+    if (_controller.activeIncident == null || _controller.activeIncident?.stage == IncidentStage.cancelled) {
       final incident = _controller.activateEmergency(locationNote: 'Last known location: Yaba, Lagos');
       _controller.markDispatching(incident.id);
-      setState(() {
-        _holdProgress = 0;
-        _tab = ResidentTab.tracking;
-      });
     }
+    setState(() {
+      _holdProgress = 0;
+      _tab = ResidentTab.tracking;
+    });
   }
 
   Future<void> _showCancelSheet(EmergencyIncident? incident) async {
@@ -211,20 +257,52 @@ class _StatusStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tone = controller.lowBatteryMode
+        ? EmergencyTone.warning
+        : controller.isOffline
+            ? EmergencyTone.offline
+            : EmergencyTone.recovery;
+    final title = controller.lowBatteryMode
+        ? 'Low power protection'
+        : controller.isOffline
+            ? 'Offline protection active'
+            : 'Protected and online';
+    final message = [
+      controller.smsFallbackReady ? 'SMS ready' : 'SMS off',
+      '${controller.batteryPercent}% battery',
+      controller.silentPanicArmed ? 'silent armed' : 'visible mode',
+    ].join(' - ');
+
     return Material(
       color: ResidentEmergencyTheme.graphite,
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
-          child: Wrap(
-            spacing: 8,
-            runSpacing: 8,
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+          child: Row(
             children: [
-              EmergencyStatusPill(icon: controller.isOffline ? Icons.cloud_off : Icons.cloud_done, label: controller.isOffline ? 'Offline protected' : 'Online', tone: controller.isOffline ? EmergencyTone.offline : EmergencyTone.recovery),
-              EmergencyStatusPill(icon: Icons.sms, label: controller.smsFallbackReady ? 'SMS fallback ready' : 'SMS fallback off', tone: EmergencyTone.warning, active: controller.smsFallbackReady),
-              EmergencyStatusPill(icon: Icons.battery_2_bar, label: '${controller.batteryPercent}% battery', tone: controller.lowBatteryMode ? EmergencyTone.warning : EmergencyTone.recovery),
-              EmergencyStatusPill(icon: Icons.visibility_off, label: controller.silentPanicArmed ? 'Silent armed' : 'Visible mode', tone: EmergencyTone.warning, active: controller.silentPanicArmed),
+              EmergencyIconBlock(
+                icon: controller.isOffline ? Icons.cloud_off : Icons.verified_user,
+                tone: tone,
+              ),
+              const SizedBox(width: ResidentEmergencyTheme.space3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: ResidentEmergencyTheme.space1),
+                    Text(message, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ],
+                ),
+              ),
+              const SizedBox(width: ResidentEmergencyTheme.space2),
+              EmergencyStatusPill(
+                icon: Icons.sms,
+                label: controller.smsFallbackReady ? 'SMS' : 'No SMS',
+                tone: controller.smsFallbackReady ? EmergencyTone.warning : EmergencyTone.offline,
+                active: controller.smsFallbackReady,
+              ),
             ],
           ),
         ),
@@ -245,8 +323,8 @@ class _OnboardingPanel extends StatelessWidget {
       children: [
         const EmergencyHeaderCard(
           icon: Icons.health_and_safety,
-          title: 'Set up emergency help',
-          body: 'Confirm language, trusted contacts, SMS fallback, and low-battery behavior before field use.',
+          title: 'One-minute emergency setup',
+          body: 'Choose language, confirm SMS contact, then start protected mode.',
           tone: EmergencyTone.calm,
         ),
         const SizedBox(height: 12),
@@ -265,7 +343,7 @@ class _OnboardingPanel extends StatelessWidget {
         FilledButton.icon(
           onPressed: controller.contacts.where((contact) => contact.notifyBySms).isEmpty ? null : controller.completeOnboarding,
           icon: const Icon(Icons.verified_user),
-          label: const Text('Finish emergency setup'),
+          label: const Text('Start protected mode'),
         ),
       ],
     );
@@ -273,11 +351,12 @@ class _OnboardingPanel extends StatelessWidget {
 }
 
 class _SosView extends StatelessWidget {
-  const _SosView({required this.controller, required this.holdProgress, required this.onHold, required this.onCancel});
+  const _SosView({required this.controller, required this.holdProgress, required this.onHoldStart, required this.onHoldEnd, required this.onCancel});
 
   final ResidentEmergencyController controller;
   final int holdProgress;
-  final VoidCallback onHold;
+  final VoidCallback onHoldStart;
+  final VoidCallback onHoldEnd;
   final ValueChanged<EmergencyIncident?> onCancel;
 
   @override
@@ -297,27 +376,32 @@ class _SosView extends StatelessWidget {
         const SizedBox(height: 12),
         _IncidentSelector(controller: controller),
         const SizedBox(height: 14),
+        if (active != null) ...[
+          _ActiveEmergencyPanel(controller: controller, incident: active),
+          const SizedBox(height: 14),
+        ],
         Semantics(
           button: true,
           label: controller.silentPanicArmed ? 'Silent emergency help button. Hold for help.' : 'Emergency SOS button. Hold for help.',
-          hint: 'Activates emergency alert after three presses in this validation build.',
-          child: CalmSosButton(progress: holdProgress, silent: controller.silentPanicArmed, onPressed: onHold),
+          hint: 'Activates emergency alert after a continuous three-second hold.',
+          child: CalmSosButton(
+            progress: holdProgress,
+            silent: controller.silentPanicArmed,
+            lowResourceMode: controller.lowResourceMode,
+            onHoldStart: onHoldStart,
+            onHoldEnd: onHoldEnd,
+          ),
         ),
         const SizedBox(height: 12),
         CalmBanner(
           icon: controller.silentPanicArmed ? Icons.visibility_off : Icons.verified_user,
           title: controller.silentPanicArmed ? 'Quiet mode is protecting you' : 'You stay in control',
-          message: controller.silentPanicArmed ? 'The app remains calm while operators receive a higher-risk signal.' : 'The alert is saved first, then sent by data or SMS fallback.',
+          message: controller.silentPanicArmed ? 'The screen stays calm. Operators see the coercion risk.' : 'The phone saves the alert first, then sends by data or SMS.',
           tone: controller.silentPanicArmed ? EmergencyTone.warning : EmergencyTone.calm,
         ),
         const SizedBox(height: 12),
         if (controller.pilotDemoMode) ...[
-          EmergencyPrimaryAction(
-            icon: Icons.play_circle,
-            label: 'Run pilot SOS simulation',
-            onPressed: controller.runPilotResponderSimulation,
-            tone: EmergencyTone.calm,
-          ),
+          EmergencyCompactAction(icon: Icons.play_circle, label: 'Run pilot simulation', onTap: controller.runPilotResponderSimulation),
           const SizedBox(height: 12),
         ],
         LinearProgressIndicator(
@@ -336,6 +420,49 @@ class _SosView extends StatelessWidget {
         const SizedBox(height: 12),
         _DeliveryCard(controller: controller),
       ],
+    );
+  }
+}
+
+class _ActiveEmergencyPanel extends StatelessWidget {
+  const _ActiveEmergencyPanel({required this.controller, required this.incident});
+
+  final ResidentEmergencyController controller;
+  final EmergencyIncident incident;
+
+  @override
+  Widget build(BuildContext context) {
+    final isSilent = incident.silent || controller.silentPanicArmed;
+    return EmergencySurface(
+      elevated: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              EmergencyIconBlock(
+                icon: isSilent ? Icons.visibility_off : Icons.verified_user,
+                tone: isSilent ? EmergencyTone.warning : EmergencyTone.recovery,
+              ),
+              const SizedBox(width: ResidentEmergencyTheme.space3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(isSilent ? 'Silent help is active' : 'Help request saved', style: Theme.of(context).textTheme.titleLarge),
+                    const SizedBox(height: ResidentEmergencyTheme.space1),
+                    Text(_stageLabel(incident.stage), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: ResidentEmergencyTheme.space3),
+          EmergencyTimelineStep(done: true, label: 'Saved on this phone', tone: EmergencyTone.recovery),
+          EmergencyTimelineStep(done: incident.channel != DeliveryChannel.data || !controller.isOffline, label: _channelLabel(incident.channel), tone: controller.isOffline ? EmergencyTone.warning : EmergencyTone.recovery),
+          EmergencyTimelineStep(done: incident.stage == IncidentStage.dispatching || incident.stage == IncidentStage.responderEnRoute, label: 'Operator desk visible', tone: EmergencyTone.calm),
+        ],
+      ),
     );
   }
 }
@@ -477,9 +604,9 @@ class _TrackingView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const EmergencySectionTitle(title: 'Responder tracking', subtitle: 'Low-data route view built for weak networks and battery preservation.'),
+        const EmergencySectionTitle(title: 'Responder map', subtitle: 'Low-data route view for weak networks and battery preservation.'),
         const SizedBox(height: 12),
-        _LowBandwidthMap(incident: active),
+        _LowBandwidthMap(incident: active, lowResourceMode: controller.lowResourceMode),
         const SizedBox(height: 12),
         CalmBanner(
           icon: active.stage == IncidentStage.responderEnRoute ? Icons.directions_run : Icons.support_agent,
@@ -552,6 +679,13 @@ class _SettingsView extends StatelessWidget {
         ),
         _ModePicker(controller: controller),
         const SizedBox(height: 12),
+        _SwitchRow(
+          icon: Icons.memory,
+          title: 'Low-spec phone mode',
+          subtitle: 'Reduces motion and map detail for 4GB RAM and Android Go devices.',
+          value: controller.lowResourceMode,
+          onChanged: controller.setLowResourceMode,
+        ),
         Text('Battery reserve', style: Theme.of(context).textTheme.titleMedium),
         Slider(
           value: controller.batteryPercent.toDouble(),
@@ -622,15 +756,29 @@ class _IncidentSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SegmentedButton<IncidentKind>(
-      segments: const [
-        ButtonSegment(value: IncidentKind.medical, icon: Icon(Icons.medical_services), label: Text('Medical')),
-        ButtonSegment(value: IncidentKind.fire, icon: Icon(Icons.local_fire_department), label: Text('Fire')),
-        ButtonSegment(value: IncidentKind.security, icon: Icon(Icons.shield), label: Text('Security')),
+    return Row(
+      children: [
+        EmergencySegmentButton(
+          icon: Icons.medical_services,
+          label: 'Medical',
+          selected: controller.selectedKind == IncidentKind.medical,
+          onTap: () => controller.setIncidentKind(IncidentKind.medical),
+        ),
+        const SizedBox(width: ResidentEmergencyTheme.space2),
+        EmergencySegmentButton(
+          icon: Icons.local_fire_department,
+          label: 'Fire',
+          selected: controller.selectedKind == IncidentKind.fire,
+          onTap: () => controller.setIncidentKind(IncidentKind.fire),
+        ),
+        const SizedBox(width: ResidentEmergencyTheme.space2),
+        EmergencySegmentButton(
+          icon: Icons.shield,
+          label: 'Security',
+          selected: controller.selectedKind == IncidentKind.security,
+          onTap: () => controller.setIncidentKind(IncidentKind.security),
+        ),
       ],
-      selected: {controller.selectedKind},
-      onSelectionChanged: (value) => controller.setIncidentKind(value.first),
-      style: ButtonStyle(shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))),
     );
   }
 }
@@ -672,10 +820,10 @@ class _ReadinessChecklist extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            EmergencyTimelineStep(done: controller.contacts.isNotEmpty, label: '${controller.contacts.length} trusted contacts loaded'),
-            EmergencyTimelineStep(done: controller.contacts.any((contact) => contact.notifyBySms), label: 'At least one SMS contact enabled'),
-            EmergencyTimelineStep(done: controller.smsFallbackReady, label: 'Telecom fallback indicator visible'),
-            EmergencyTimelineStep(done: controller.lowBatteryMode, label: 'Ultra-low-battery behavior visible'),
+            EmergencyTimelineStep(done: controller.contacts.isNotEmpty, label: '${controller.contacts.length} trusted contacts ready'),
+            EmergencyTimelineStep(done: controller.contacts.any((contact) => contact.notifyBySms), label: 'SMS backup contact enabled'),
+            EmergencyTimelineStep(done: controller.smsFallbackReady, label: 'SMS fallback visible'),
+            EmergencyTimelineStep(done: controller.lowBatteryMode, label: 'Low-battery mode visible'),
           ],
         ),
       ),
@@ -742,52 +890,61 @@ class _IncidentTile extends StatelessWidget {
 }
 
 class _LowBandwidthMap extends StatelessWidget {
-  const _LowBandwidthMap({required this.incident});
+  const _LowBandwidthMap({required this.incident, required this.lowResourceMode});
 
   final EmergencyIncident incident;
+  final bool lowResourceMode;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 210,
-      decoration: BoxDecoration(
-        color: ResidentEmergencyTheme.graphite,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF34413A)),
-      ),
-      child: Stack(
-        children: [
-          Positioned.fill(child: CustomPaint(painter: _LowBandwidthMapPainter())),
-          const Positioned(left: 28, bottom: 34, child: _MapMarker(icon: Icons.home, label: 'You')),
-          Positioned(
-            right: 36,
-            top: 32,
-            child: _MapMarker(icon: incident.kind == IncidentKind.medical ? Icons.local_hospital : Icons.shield, label: 'Responder'),
-          ),
-        ],
+    return RepaintBoundary(
+      child: Container(
+        height: lowResourceMode ? 188 : 210,
+        decoration: BoxDecoration(
+          color: ResidentEmergencyTheme.graphite,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFF34413A)),
+        ),
+        child: Stack(
+          children: [
+            Positioned.fill(child: CustomPaint(painter: _LowBandwidthMapPainter(lowResourceMode: lowResourceMode))),
+            const Positioned(left: 28, bottom: 34, child: _MapMarker(icon: Icons.home, label: 'You')),
+            Positioned(
+              right: 36,
+              top: 32,
+              child: _MapMarker(icon: incident.kind == IncidentKind.medical ? Icons.local_hospital : Icons.shield, label: 'Responder'),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _LowBandwidthMapPainter extends CustomPainter {
+  const _LowBandwidthMapPainter({required this.lowResourceMode});
+
+  final bool lowResourceMode;
+
   @override
   void paint(Canvas canvas, Size size) {
     final road = Paint()
       ..color = const Color(0xFF3B4740)
-      ..strokeWidth = 4
+      ..strokeWidth = lowResourceMode ? 3 : 4
       ..style = PaintingStyle.stroke;
     final route = Paint()
       ..color = ResidentEmergencyTheme.amber
-      ..strokeWidth = 5
+      ..strokeWidth = lowResourceMode ? 4 : 5
       ..style = PaintingStyle.stroke;
     canvas.drawLine(Offset(0, size.height * 0.35), Offset(size.width, size.height * 0.2), road);
-    canvas.drawLine(Offset(size.width * 0.14, size.height), Offset(size.width * 0.88, 0), road);
+    if (!lowResourceMode) {
+      canvas.drawLine(Offset(size.width * 0.14, size.height), Offset(size.width * 0.88, 0), road);
+    }
     canvas.drawLine(Offset(size.width * 0.18, size.height * 0.76), Offset(size.width * 0.78, size.height * 0.28), route);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _LowBandwidthMapPainter oldDelegate) => oldDelegate.lowResourceMode != lowResourceMode;
 }
 
 class _MapMarker extends StatelessWidget {

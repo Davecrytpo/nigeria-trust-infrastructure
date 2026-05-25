@@ -6,6 +6,20 @@ Status: Controlled field preparation baseline.
 
 The Yaba pilot must remain controlled, supervised, operationally narrow, and intentionally limited. It is not a consumer launch.
 
+## First Resident Execution
+
+The first live milestone is one resident successfully using the system on one physical Android phone in Yaba.
+
+- One resident phone.
+- Two trusted contacts.
+- One operator console session.
+- One supervised SOS simulation.
+- One airplane-mode SOS and recovery pass.
+- One responder tracking demonstration.
+- Evidence stored in `reports/mobile`.
+
+Do not expand the pilot cohort until this path is boring, repeatable, and understandable to the resident without coaching.
+
 ## Scope Limits
 
 - Maximum residents: 300.
