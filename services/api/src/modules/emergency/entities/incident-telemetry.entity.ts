@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+} from 'typeorm';
 import { Incident } from '../entities/incident.entity';
 
 @Entity('incident_telemetry')
@@ -15,10 +21,17 @@ export class IncidentTelemetry {
   @Column()
   stage: string;
 
-  @Column({ type: 'int', comment: 'Latency in milliseconds from previous stage' })
+  @Column({
+    type: 'int',
+    comment: 'Latency in milliseconds from previous stage',
+  })
   latencyMs: number;
 
-  @Column({ type: 'jsonb', nullable: true, comment: 'Network status, battery level, etc.' })
+  @Column({
+    type: 'jsonb',
+    nullable: true,
+    comment: 'Network status, battery level, etc.',
+  })
   context: any;
 
   @CreateDateColumn()

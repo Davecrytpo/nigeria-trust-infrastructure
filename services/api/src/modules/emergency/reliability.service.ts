@@ -7,8 +7,15 @@ export class ReliabilityService {
   /**
    * Records latency and environment context for Section 12 (Reliability).
    */
-  async logTelemetry(incidentId: string, stage: string, latency: number, context: any): Promise<void> {
-    this.logger.log(`[TELEMETRY] Incident ${incidentId} reached ${stage} in ${latency}ms. Context: ${JSON.stringify(context)}`);
+  async logTelemetry(
+    incidentId: string,
+    stage: string,
+    latency: number,
+    context: any,
+  ): Promise<void> {
+    this.logger.log(
+      `[TELEMETRY] Incident ${incidentId} reached ${stage} in ${latency}ms. Context: ${JSON.stringify(context)}`,
+    );
     // In production, this writes to IncidentTelemetry entity
   }
 
@@ -18,7 +25,9 @@ export class ReliabilityService {
   async simulateNetworkFailure(probability: number = 0.1): Promise<boolean> {
     const isFailing = Math.random() < probability;
     if (isFailing) {
-      this.logger.warn(`SIMULATED FAILURE: Dropping request to test offline fallback.`);
+      this.logger.warn(
+        `SIMULATED FAILURE: Dropping request to test offline fallback.`,
+      );
     }
     return isFailing;
   }

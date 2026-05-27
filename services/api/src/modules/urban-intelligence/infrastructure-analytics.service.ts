@@ -17,7 +17,7 @@ export class InfrastructureAnalyticsService {
    */
   async getPerformanceMetrics(): Promise<InfrastructureMetrics> {
     this.logger.log('Calculating infrastructure reliability metrics.');
-    
+
     return {
       totalIncidents: 145,
       meanTimeToAcknowledgment: 112, // seconds
@@ -32,6 +32,7 @@ export class InfrastructureAnalyticsService {
    */
   async getResponderAnalytics(responderId: string): Promise<any> {
     return {
+      responderId,
       averageResponseTime: '4m 12s',
       successfulResolutions: 12,
       trustScoreTrend: 'Stable',

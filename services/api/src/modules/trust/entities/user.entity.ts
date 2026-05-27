@@ -1,4 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+} from 'typeorm';
 
 export enum UserRole {
   RESIDENT = 'RESIDENT',
@@ -26,10 +31,14 @@ export class User {
   @Column({ type: 'enum', enum: UserRole, default: UserRole.RESIDENT })
   role: UserRole;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, default: 50.00 })
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 50.0 })
   trustScore: number;
 
-  @Column({ type: 'enum', enum: VerificationStatus, default: VerificationStatus.PENDING })
+  @Column({
+    type: 'enum',
+    enum: VerificationStatus,
+    default: VerificationStatus.PENDING,
+  })
   verificationStatus: VerificationStatus;
 
   @Column({ nullable: true })

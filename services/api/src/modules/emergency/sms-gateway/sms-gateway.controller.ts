@@ -11,6 +11,9 @@ export class SmsGatewayController {
    */
   @Post()
   async handleWebhook(@Body() payload: { from: string; text: string }) {
-    return this.smsGatewayService.handleIncomingSms(payload.from, payload.text);
+    return await this.smsGatewayService.handleIncomingSms(
+      payload.from,
+      payload.text,
+    );
   }
 }

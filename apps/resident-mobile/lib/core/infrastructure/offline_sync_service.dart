@@ -14,14 +14,14 @@ class OfflineSyncService {
         _cipher = cipher ?? AesGcm.with256bits();
 
   static Database? _database;
-  static const _queueKeyName = 'resident_mobile_offline_queue_key_v1';
+  static const _queueKeyName = 'ekotrust_mobile_offline_queue_key_v1';
 
   final FlutterSecureStorage _secureStorage;
   final AesGcm _cipher;
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('emergency_offline.db');
+    _database = await _initDB('ekotrust_offline.db');
     return _database!;
   }
 
@@ -42,13 +42,13 @@ class OfflineSyncService {
 
   Future<void> _createDB(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE incident_queue (
+      CREATE TABLE proof_queue (
         id TEXT PRIMARY KEY,
         client_mutation_id TEXT NOT NULL UNIQUE,
         payload_ciphertext TEXT NOT NULL,
         status TEXT NOT NULL DEFAULT 'pending',
         attempt_count INTEGER NOT NULL DEFAULT 0,
-        server_incident_id TEXT,
+        server_proof_id TEXT,
         last_error TEXT,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
@@ -57,14 +57,15 @@ class OfflineSyncService {
     ''');
 
     await db.execute('''
-      CREATE INDEX incident_queue_status_created_idx
-      ON incident_queue(status, created_at)
+      CREATE INDEX proof_queue_status_created_idx
+      ON proof_queue(status, created_at)
     ''');
   }
 
   Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      await db.execute('ALTER TABLE incident_queue RENAME TO incident_queue_legacy_plaintext');
+      await db.execute(
+          'ALTER TABLE proof_queue RENAME TO proof_queue_legacy_plaintext');
       await _createDB(db, newVersion);
     }
   }
@@ -76,7 +77,7 @@ class OfflineSyncService {
 
   Future<void> _recoverInterruptedUploads(Database db) async {
     await db.update(
-      'incident_queue',
+      'proof_queue',
       {
         'status': 'pending',
         'updated_at': DateTime.now().toUtc().toIso8601String(),
@@ -85,22 +86,22 @@ class OfflineSyncService {
     );
   }
 
-  Future<void> queueIncident(Map<String, dynamic> incident) async {
+  Future<void> queueProof(Map<String, dynamic> proof) async {
     final db = await database;
     final now = DateTime.now().toUtc().toIso8601String();
-    final clientMutationId = (incident['clientMutationId'] ??
-            incident['id'] ??
+    final clientMutationId = (proof['clientMutationId'] ??
+            proof['id'] ??
             'mobile-${DateTime.now().microsecondsSinceEpoch}-${Random.secure().nextInt(1 << 32)}')
         .toString();
     final payload = {
-      ...incident,
+      ...proof,
       'clientMutationId': clientMutationId,
     };
     final encryptedPayload = await _encryptJson(payload);
 
     await db.transaction((txn) async {
       await txn.insert(
-        'incident_queue',
+        'proof_queue',
         {
           'id': clientMutationId,
           'client_mutation_id': clientMutationId,
@@ -115,26 +116,26 @@ class OfflineSyncService {
     });
   }
 
-  Future<List<Map<String, dynamic>>> getPendingIncidents({int limit = 25}) async {
+  Future<List<Map<String, dynamic>>> getPendingProofs({int limit = 25}) async {
     final db = await database;
     final rows = await db.query(
-      'incident_queue',
+      'proof_queue',
       where: "status IN ('pending', 'failed')",
       orderBy: 'created_at ASC',
       limit: limit,
     );
 
-    final incidents = <Map<String, dynamic>>[];
+    final proofs = <Map<String, dynamic>>[];
     for (final row in rows) {
       final payload = await _decryptJson(row['payload_ciphertext'] as String);
-      incidents.add({
+      proofs.add({
         ...payload,
         'queueId': row['id'],
         'clientMutationId': row['client_mutation_id'],
         'attemptCount': row['attempt_count'],
       });
     }
-    return incidents;
+    return proofs;
   }
 
   Future<void> markSyncing(List<String> clientMutationIds) async {
@@ -145,7 +146,7 @@ class OfflineSyncService {
     await db.transaction((txn) async {
       for (final id in clientMutationIds) {
         await txn.update(
-          'incident_queue',
+          'proof_queue',
           {
             'status': 'syncing',
             'updated_at': now,
@@ -156,7 +157,7 @@ class OfflineSyncService {
         );
         await txn.rawUpdate(
           '''
-          UPDATE incident_queue
+          UPDATE proof_queue
           SET attempt_count = attempt_count + 1
           WHERE client_mutation_id = ?
           ''',
@@ -166,13 +167,13 @@ class OfflineSyncService {
     });
   }
 
-  Future<void> markSynced(String clientMutationId, String serverIncidentId) async {
+  Future<void> markSynced(String clientMutationId, String serverProofId) async {
     final db = await database;
     await db.update(
-      'incident_queue',
+      'proof_queue',
       {
         'status': 'synced',
-        'server_incident_id': serverIncidentId,
+        'server_proof_id': serverProofId,
         'last_error': null,
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       },
@@ -184,7 +185,7 @@ class OfflineSyncService {
   Future<void> markFailed(String clientMutationId, Object error) async {
     final db = await database;
     await db.update(
-      'incident_queue',
+      'proof_queue',
       {
         'status': 'failed',
         'last_error': error.toString(),
@@ -199,7 +200,7 @@ class OfflineSyncService {
     final db = await database;
     final rows = await db.rawQuery('''
       SELECT status, COUNT(*) AS count
-      FROM incident_queue
+      FROM proof_queue
       GROUP BY status
     ''');
 
@@ -242,8 +243,10 @@ class OfflineSyncService {
       return SecretKey(base64Decode(existing));
     }
 
-    final keyBytes = List<int>.generate(32, (_) => Random.secure().nextInt(256));
-    await _secureStorage.write(key: _queueKeyName, value: base64Encode(keyBytes));
+    final keyBytes =
+        List<int>.generate(32, (_) => Random.secure().nextInt(256));
+    await _secureStorage.write(
+        key: _queueKeyName, value: base64Encode(keyBytes));
     return SecretKey(keyBytes);
   }
 }

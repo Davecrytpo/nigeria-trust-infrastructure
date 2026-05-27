@@ -1,6 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { User } from '../../trust/entities/user.entity';
-import { IncidentType, IncidentStage, Severity, EntryMethod } from '@shared/domain';
+import {
+  IncidentType,
+  IncidentStage,
+  Severity,
+  EntryMethod,
+} from '@shared/domain';
 
 @Entity('incidents')
 export class Incident {
@@ -17,7 +29,11 @@ export class Incident {
   @Column({ type: 'enum', enum: IncidentType })
   type: IncidentType;
 
-  @Column({ type: 'enum', enum: IncidentStage, default: IncidentStage.DETECTION })
+  @Column({
+    type: 'enum',
+    enum: IncidentStage,
+    default: IncidentStage.DETECTION,
+  })
   stage: IncidentStage;
 
   @Column({ type: 'enum', enum: Severity })

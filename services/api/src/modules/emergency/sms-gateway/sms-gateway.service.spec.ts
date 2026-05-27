@@ -1,12 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SmsGatewayService } from './sms-gateway.service';
+import { EmergencyService } from '../emergency.service';
 
 describe('SmsGatewayService', () => {
   let service: SmsGatewayService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [SmsGatewayService],
+      providers: [
+        SmsGatewayService,
+        {
+          provide: EmergencyService,
+          useValue: { detectIncident: jest.fn() },
+        },
+      ],
     }).compile();
 
     service = module.get<SmsGatewayService>(SmsGatewayService);

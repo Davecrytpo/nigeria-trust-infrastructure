@@ -14,13 +14,19 @@ import { DisasterModeService } from './disaster-mode.service';
   imports: [HumanModule, TrustModule],
   controllers: [EmergencyController, SmsGatewayController],
   providers: [
-    EmergencyService, 
-    ReliabilityService, 
-    ReplayService, 
+    EmergencyService,
+    ReliabilityService,
+    ReplayService,
     SmsGatewayService,
     SeverityEngineService,
     DisasterModeService,
   ],
-  exports: [EmergencyService, ReliabilityService, ReplayService, SeverityEngineService, DisasterModeService],
+  exports: [
+    EmergencyService,
+    ReliabilityService,
+    ReplayService,
+    SeverityEngineService,
+    DisasterModeService,
+  ],
 })
 export class EmergencyModule {}

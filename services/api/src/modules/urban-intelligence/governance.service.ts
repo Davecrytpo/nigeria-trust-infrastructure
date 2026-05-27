@@ -10,7 +10,7 @@ export class GovernanceService {
    */
   async packageEvidence(incidentId: string): Promise<any> {
     this.logger.log(`Packaging immutable evidence for Incident ${incidentId}`);
-    
+
     return {
       incidentId,
       timestamp: new Date(),
@@ -24,6 +24,8 @@ export class GovernanceService {
    * Privacy & Data Retention Compliance.
    */
   async scrubExpiredData(): Promise<void> {
-    this.logger.log('Executing privacy scrub for expired sensitive location data.');
+    this.logger.log(
+      'Executing privacy scrub for expired sensitive location data.',
+    );
   }
 }

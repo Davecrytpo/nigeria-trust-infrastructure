@@ -1,6 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EmergencyService } from '../emergency.service';
-import { EntryMethod, IncidentType, SMS_KEYWORDS } from '@shared/domain';
+import { EntryMethod, SMS_KEYWORDS } from '@shared/domain';
+
+type SmsGatewayResult =
+  | { status: 'error'; message: string }
+  | { status: 'success'; incidentId: string; responseMessage: string };
 
 @Injectable()
 export class SmsGatewayService {
@@ -12,18 +16,25 @@ export class SmsGatewayService {
    * Processes an incoming SMS message (Section 5).
    * Format: "KEYWORD [OPTIONAL_LOCATION_DETAILS]"
    */
-  async handleIncomingSms(phoneNumber: string, message: string): Promise<any> {
+  async handleIncomingSms(
+    phoneNumber: string,
+    message: string,
+  ): Promise<SmsGatewayResult> {
     const rawContent = message.trim().toUpperCase();
     const [keyword, ...details] = rawContent.split(' ');
 
     const incidentType = SMS_KEYWORDS[keyword as keyof typeof SMS_KEYWORDS];
 
     if (!incidentType) {
-      this.logger.warn(`Received invalid SMS keyword: ${keyword} from ${phoneNumber}`);
+      this.logger.warn(
+        `Received invalid SMS keyword: ${keyword} from ${phoneNumber}`,
+      );
       return { status: 'error', message: 'Invalid Keyword' };
     }
 
-    this.logger.log(`Creating SMS-triggered incident: ${incidentType} for ${phoneNumber}`);
+    this.logger.log(
+      `Creating SMS-triggered incident: ${incidentType} for ${phoneNumber}`,
+    );
 
     // Create the incident record in Stage 1: Detection
     const incident = await this.emergencyService.detectIncident({

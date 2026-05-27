@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { IncidentType, Severity } from '@shared/domain';
+import { IncidentType } from '@shared/domain';
 
 export interface HeatmapPoint {
   lat: number;
@@ -17,15 +17,17 @@ export class UrbanIntelligenceService {
    * Generates danger heatmaps based on historical incident clusters.
    */
   async getRiskHeatmap(neighborhoodId: string): Promise<HeatmapPoint[]> {
-    this.logger.log(`Generating risk heatmap for neighborhood: ${neighborhoodId}`);
-    
+    this.logger.log(
+      `Generating risk heatmap for neighborhood: ${neighborhoodId}`,
+    );
+
     // In production, this runs a PostGIS cluster query:
-    // SELECT ST_X(location), ST_Y(location), COUNT(*) 
+    // SELECT ST_X(location), ST_Y(location), COUNT(*)
     // FROM incidents WHERE neighborhood_id = :id GROUP BY cluster
-    
+
     return [
       { lat: 6.5244, lng: 3.3792, weight: 0.8, type: IncidentType.ROBBERY },
-      { lat: 6.5230, lng: 3.3780, weight: 0.5, type: IncidentType.FIRE },
+      { lat: 6.523, lng: 3.378, weight: 0.5, type: IncidentType.FIRE },
     ];
   }
 

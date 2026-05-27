@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Sse } from '@nestjs/common';
 import { EmergencyService } from './emergency.service';
 import { HumanService } from '../human/human.service';
 import { Incident } from '@shared/domain';
@@ -19,16 +19,21 @@ export class EmergencyController {
   async getNearbyResponders(@Param('id') id: string) {
     const incident = await this.emergencyService.getIncident(id);
     if (!incident || !incident.location) return [];
-    
+
     return this.humanService.findNearbyResponders(
-      incident.location.lat, 
-      incident.location.lng
+      incident.location.lat,
+      incident.location.lng,
     );
   }
 
   @Get('incidents')
   async list() {
     return this.emergencyService.listIncidents();
+  }
+
+  @Sse('events')
+  events() {
+    return this.emergencyService.incidentEvents();
   }
 
   @Get('incidents/:id')
@@ -44,6 +49,14 @@ export class EmergencyController {
   @Put('incidents/:id/track')
   async track(@Param('id') id: string) {
     return this.emergencyService.trackResponse(id);
+  }
+
+  @Post('incidents/:id/coercion')
+  async coercion(
+    @Param('id') id: string,
+    @Body() data: { coercion_flag?: boolean; status?: string; source?: string },
+  ) {
+    return this.emergencyService.reportCoercion(id, data);
   }
 
   @Put('incidents/:id/resolve')

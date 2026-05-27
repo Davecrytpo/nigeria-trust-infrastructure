@@ -4,7 +4,15 @@ import { InfrastructureAnalyticsService } from './infrastructure-analytics.servi
 import { GovernanceService } from './governance.service';
 
 @Module({
-  providers: [UrbanIntelligenceService, InfrastructureAnalyticsService, GovernanceService],
-  exports: [UrbanIntelligenceService, InfrastructureAnalyticsService, GovernanceService],
+  providers: [
+    UrbanIntelligenceService,
+    InfrastructureAnalyticsService,
+    GovernanceService,
+  ],
+  exports: [
+    UrbanIntelligenceService,
+    InfrastructureAnalyticsService,
+    GovernanceService,
+  ],
 })
 export class UrbanIntelligenceModule {}

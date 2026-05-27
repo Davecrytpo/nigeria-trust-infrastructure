@@ -1,5 +1,5 @@
-name: resident_mobile
-description: "Nigeria Emergency, Trust & Human Infrastructure - Resident Mobile (Android-First)"
+name: ekotrust_mobile
+description: "EkoTrust - reputation infrastructure for Africa's informal economy."
 version: 1.0.0+1
 
 environment:
@@ -13,6 +13,7 @@ dependencies:
   sqflite: ^2.3.0
   path: ^1.8.3
   http: ^1.1.0
+  image_picker: ^1.1.2
   web_socket_channel: ^2.4.0
   provider: ^6.0.5
   cryptography: ^2.7.0

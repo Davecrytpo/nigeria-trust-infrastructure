@@ -22,12 +22,15 @@ export class DeadManSwitchService {
     const state = this.responderStates.get(responderId);
     if (!state) return true;
 
-    const silenceDurationSec = (Date.now() - state.lastHeartbeat.getTime()) / 1000;
+    const silenceDurationSec =
+      (Date.now() - state.lastHeartbeat.getTime()) / 1000;
 
-    // RULE 1: Connectivity Loss vs Silence. 
+    // RULE 1: Connectivity Loss vs Silence.
     // If battery was high (>20%) and they stop sending data for 5 mins -> Potential Danger.
     if (state.batteryLevel > 20 && silenceDurationSec > 300) {
-      this.logger.error(`DEAD-MAN TRIGGER: Responder ${responderId} silent for 5m with high battery.`);
+      this.logger.error(
+        `DEAD-MAN TRIGGER: Responder ${responderId} silent for 5m with high battery.`,
+      );
       return false; // Trigger alert
     }
 
@@ -37,7 +40,12 @@ export class DeadManSwitchService {
     return true;
   }
 
-  async updateHeartbeat(responderId: string, lat: number, lng: number, battery: number): Promise<void> {
+  async updateHeartbeat(
+    responderId: string,
+    lat: number,
+    lng: number,
+    battery: number,
+  ): Promise<void> {
     this.responderStates.set(responderId, {
       responderId,
       lastHeartbeat: new Date(),

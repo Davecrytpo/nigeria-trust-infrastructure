@@ -14,17 +14,21 @@ export class SeverityEngineService {
    */
   async evaluateSeverity(incident: Incident): Promise<Severity> {
     const ageMinutes = (Date.now() - incident.createdAt.getTime()) / 60000;
-    
+
     // Threshold-based escalation logic
     if (incident.stage === IncidentStage.LOCAL_COORDINATION && ageMinutes > 5) {
       if (incident.severity === Severity.MEDIUM) {
-        this.logger.warn(`Incident ${incident.id} auto-escalating to HIGH due to response delay.`);
+        this.logger.warn(
+          `Incident ${incident.id} auto-escalating to HIGH due to response delay.`,
+        );
         return Severity.HIGH;
       }
     }
 
     if (incident.severity === Severity.HIGH && ageMinutes > 10) {
-      this.logger.error(`Incident ${incident.id} auto-escalating to CRITICAL. Threshold exceeded.`);
+      this.logger.error(
+        `Incident ${incident.id} auto-escalating to CRITICAL. Threshold exceeded.`,
+      );
       return Severity.CRITICAL;
     }
 
@@ -35,8 +39,15 @@ export class SeverityEngineService {
    * Incident Deduplication (Mass Reporting).
    * Groups multiple reports of the same event into a single 'Authoritative Incident'.
    */
-  async findDuplicate(lat: number, lng: number, type: string): Promise<string | null> {
+  async findDuplicate(
+    lat: number,
+    lng: number,
+    type: string,
+  ): Promise<string | null> {
+    void lat;
+    void lng;
+    void type;
     // Logic to search for incidents within 100m of the same type in the last 15 minutes.
-    return null; 
+    return null;
   }
 }

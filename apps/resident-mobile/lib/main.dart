@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:resident_mobile/core/presentation/resident_emergency_theme.dart';
-import 'package:resident_mobile/features/emergency/presentation/emergency_alert_screen.dart';
+import 'package:ekotrust_mobile/core/presentation/ekotrust_theme.dart';
+import 'package:ekotrust_mobile/features/ekotrust/presentation/ekotrust_app_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   PaintingBinding.instance.imageCache.maximumSize = 32;
   PaintingBinding.instance.imageCache.maximumSizeBytes = 8 << 20;
-  runApp(const ResidentEmergencyApp());
+  runApp(const EkoTrustApp());
 }
 
-class ResidentEmergencyApp extends StatelessWidget {
-  const ResidentEmergencyApp({super.key});
+class EkoTrustApp extends StatelessWidget {
+  const EkoTrustApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Nigeria Emergency Trust',
+      title: 'EkoTrust',
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.dark,
-      theme: ResidentEmergencyTheme.dark(),
-      home: const EmergencyAlertScreen(),
+      themeMode: ThemeMode.light,
+      theme: EkoTrustTheme.light(),
+      home: const EkoTrustAppScreen(),
     );
   }
 }

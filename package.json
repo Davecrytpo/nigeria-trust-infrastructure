@@ -9,7 +9,8 @@
     "services/*"
   ],
   "scripts": {
-    "dev": "npm run start --workspace=services/api",
+    "dev": "npm run start:dev --workspace=services/api",
+    "build": "npm run build --workspace=services/api",
     "start": "npm run start --workspace=services/api",
     "start:poc": "node services/api-prototype/src/server.js",
     "field:test": "node scripts/field-tests/run-field-drills.js",
