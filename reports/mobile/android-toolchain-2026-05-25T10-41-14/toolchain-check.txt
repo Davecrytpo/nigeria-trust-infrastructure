@@ -1,0 +1,13 @@
+[2026-05-25T10:41:14.1651544+01:00] flutter found at C:\flutter\bin\flutter.bat
+[2026-05-25T10:41:14.3653569+01:00] adb found at C:\adb\platform-tools-latest-windows\platform-tools\adb.exe
+[2026-05-25T10:41:14.4789447+01:00] java found at C:\Program Files\Eclipse Adoptium\jdk-17.0.18.8-hotspot\bin\java.exe
+[2026-05-25T10:41:14.5915497+01:00] sdkmanager found at C:\Android\cmdline-tools\latest\bin\sdkmanager.bat
+[2026-05-25T10:41:14.6632445+01:00] Android SDK root: C:\Android
+[2026-05-25T10:41:21.7322642+01:00] flutter-version: ok
+[2026-05-25T10:41:50.2750489+01:00] flutter-doctor: ok
+[2026-05-25T10:41:55.0901961+01:00] flutter-config: ok
+[2026-05-25T10:41:56.4640557+01:00] java-version: ok
+[2026-05-25T10:41:59.7954226+01:00] android-sdk-list: ok
+[2026-05-25T10:42:00.4882843+01:00] adb-version: ok
+[2026-05-25T10:42:01.0152597+01:00] adb-devices: ok
+[2026-05-25T10:42:01.7850632+01:00] ready for USB APK attempt

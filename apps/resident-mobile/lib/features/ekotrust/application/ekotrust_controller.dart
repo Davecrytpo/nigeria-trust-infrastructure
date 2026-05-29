@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cryptography/cryptography.dart';
 import 'package:ekotrust_mobile/features/ekotrust/infrastructure/ekotrust_api_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ekotrust_mobile/features/ekotrust/domain/ekotrust_models.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -32,13 +35,18 @@ class EkoTrustController extends ChangeNotifier {
     EkoTrustApiRepository? repository,
     ImagePicker? imagePicker,
     http.Client? uploadClient,
+    FlutterSecureStorage? secureStorage,
   })  : _repository = repository ?? EkoTrustApiRepository(),
         _imagePicker = imagePicker ?? ImagePicker(),
-        _uploadClient = uploadClient ?? http.Client();
+        _uploadClient = uploadClient ?? http.Client(),
+        _secureStorage = secureStorage ?? const FlutterSecureStorage() {
+    _restoreSecureAccount();
+  }
 
   final EkoTrustApiRepository _repository;
   final ImagePicker _imagePicker;
   final http.Client _uploadClient;
+  final FlutterSecureStorage _secureStorage;
   int _onboardingStep = 0;
   bool _offlineReady = true;
   bool _aiReviewQueued = false;
@@ -46,6 +54,10 @@ class EkoTrustController extends ChangeNotifier {
   String? _uploadMessage;
   EkoTrustEvidenceFile? _beforeEvidence;
   EkoTrustEvidenceFile? _afterEvidence;
+  bool _accountRestoring = true;
+  bool _registering = false;
+  String? _authMessage;
+  EkoTrustAccount? _account;
 
   int get onboardingStep => _onboardingStep;
   bool get offlineReady => _offlineReady;
@@ -55,6 +67,14 @@ class EkoTrustController extends ChangeNotifier {
   EkoTrustEvidenceFile? get beforeEvidence => _beforeEvidence;
   EkoTrustEvidenceFile? get afterEvidence => _afterEvidence;
   bool get hasEvidencePair => _beforeEvidence != null && _afterEvidence != null;
+  bool get accountRestoring => _accountRestoring;
+  bool get registering => _registering;
+  bool get isRegistered => _account != null;
+  String? get authMessage => _authMessage;
+  EkoTrustAccount? get account => _account;
+
+  static const _accountStorageKey = 'ekotrust.account.v1';
+  static const _sessionStorageKey = 'ekotrust.session.v1';
 
   List<EkoTrustOnboardingStep> get onboardingSteps => const [
         EkoTrustOnboardingStep(
@@ -137,6 +157,131 @@ class EkoTrustController extends ChangeNotifier {
           icon: Icons.home_repair_service_rounded,
         ),
       ];
+
+  int passwordStrength(String password) {
+    var score = 0;
+    if (password.length >= 8) score += 1;
+    if (password.length >= 12) score += 1;
+    if (RegExp('[A-Z]').hasMatch(password)) score += 1;
+    if (RegExp('[a-z]').hasMatch(password)) score += 1;
+    if (RegExp(r'\d').hasMatch(password)) score += 1;
+    if (RegExp(r'[^A-Za-z0-9]').hasMatch(password)) score += 1;
+    return score.clamp(0, 6);
+  }
+
+  String? validateRegistration(EkoTrustRegistrationDraft draft) {
+    if (draft.fullName.trim().split(RegExp(r'\s+')).length < 2) {
+      return 'Enter your full legal name.';
+    }
+    if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(draft.email.trim())) {
+      return 'Enter a valid email address.';
+    }
+    if (!RegExp(r'^(\+234|0)[789][01]\d{8}$')
+        .hasMatch(draft.phoneNumber.replaceAll(RegExp(r'\s+|-'), ''))) {
+      return 'Enter a valid Nigerian phone number.';
+    }
+    if (passwordStrength(draft.password) < 5) {
+      return 'Use a stronger password with 12+ characters, numbers, and symbols.';
+    }
+    if (draft.trade.trim().length < 3) return 'Enter your trade or role.';
+    if (draft.community.trim().length < 3) return 'Enter your community.';
+    if (!draft.acceptedPrivacy) {
+      return 'Accept the privacy and safety terms to protect your account.';
+    }
+    return null;
+  }
+
+  Future<bool> registerWithEmail(EkoTrustRegistrationDraft draft) async {
+    final validation = validateRegistration(draft);
+    if (validation != null) {
+      _authMessage = validation;
+      notifyListeners();
+      return false;
+    }
+
+    _registering = true;
+    _authMessage = 'Securing your account';
+    notifyListeners();
+
+    final account = EkoTrustAccount(
+      fullName: draft.fullName.trim(),
+      email: draft.email.trim().toLowerCase(),
+      phoneNumber: draft.phoneNumber.trim(),
+      trade: draft.trade.trim(),
+      community: draft.community.trim(),
+      provider: EkoTrustAccountProvider.manual,
+      twoFactorEnabled: draft.twoFactorEnabled,
+      deviceLockEnabled: draft.deviceLockEnabled,
+      recoveryContactEnabled: draft.recoveryContactEnabled,
+    );
+    await _storeAccount(account, password: draft.password);
+    _registering = false;
+    _authMessage = 'Account protected. Continue verification.';
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> registerWithGoogle({
+    required String fullName,
+    required String email,
+    required String phoneNumber,
+    required String trade,
+    required String community,
+    required bool acceptedPrivacy,
+    bool twoFactorEnabled = true,
+    bool deviceLockEnabled = true,
+    bool recoveryContactEnabled = true,
+  }) async {
+    final draft = EkoTrustRegistrationDraft(
+      fullName: fullName,
+      email: email,
+      password: 'GoogleAuth#${DateTime.now().microsecondsSinceEpoch}',
+      phoneNumber: phoneNumber,
+      trade: trade,
+      community: community,
+      acceptedPrivacy: acceptedPrivacy,
+      twoFactorEnabled: twoFactorEnabled,
+      deviceLockEnabled: deviceLockEnabled,
+      recoveryContactEnabled: recoveryContactEnabled,
+    );
+    final validation = validateRegistration(draft);
+    if (validation != null) {
+      _authMessage = validation;
+      notifyListeners();
+      return false;
+    }
+
+    _registering = true;
+    _authMessage = 'Linking Google identity';
+    notifyListeners();
+
+    await _storeAccount(
+      EkoTrustAccount(
+        fullName: fullName.trim(),
+        email: email.trim().toLowerCase(),
+        phoneNumber: phoneNumber.trim(),
+        trade: trade.trim(),
+        community: community.trim(),
+        provider: EkoTrustAccountProvider.google,
+        twoFactorEnabled: twoFactorEnabled,
+        deviceLockEnabled: deviceLockEnabled,
+        recoveryContactEnabled: recoveryContactEnabled,
+      ),
+      password: draft.password,
+    );
+    _registering = false;
+    _authMessage = 'Google account linked. Continue verification.';
+    notifyListeners();
+    return true;
+  }
+
+  Future<void> signOut() async {
+    await _secureStorage.delete(key: _sessionStorageKey);
+    _account = null;
+    _onboardingStep = 0;
+    _authMessage = 'Signed out from this device.';
+    notifyListeners();
+  }
 
   List<EkoTrustAttestation> get attestations => const [
         EkoTrustAttestation(
@@ -265,6 +410,63 @@ class EkoTrustController extends ChangeNotifier {
   void setOfflineReady(bool value) {
     _offlineReady = value;
     notifyListeners();
+  }
+
+  Future<void> _restoreSecureAccount() async {
+    try {
+      final payload = await _secureStorage.read(key: _accountStorageKey);
+      final session = await _secureStorage.read(key: _sessionStorageKey);
+      if (payload != null && session != null) {
+        _account = EkoTrustAccount.fromJson(
+          jsonDecode(payload) as Map<String, dynamic>,
+        );
+      }
+    } catch (_) {
+      _authMessage = 'Account storage is locked. Register or sign in again.';
+    } finally {
+      _accountRestoring = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> _storeAccount(
+    EkoTrustAccount account, {
+    required String password,
+  }) async {
+    final salt = _randomBytes(16);
+    final secretKey = await Pbkdf2(
+      macAlgorithm: Hmac.sha256(),
+      iterations: 120000,
+      bits: 256,
+    ).deriveKey(
+      secretKey: SecretKey(utf8.encode(password)),
+      nonce: salt,
+    );
+    final hash = await secretKey.extractBytes();
+    final sessionToken = hexFromBytes(_randomBytes(32));
+    await _secureStorage.write(
+      key: _accountStorageKey,
+      value: jsonEncode({
+        ...account.toJson(),
+        'passwordProof': hexFromBytes(hash),
+        'passwordSalt': hexFromBytes(salt),
+        'createdAt': DateTime.now().toUtc().toIso8601String(),
+      }),
+    );
+    await _secureStorage.write(
+      key: _sessionStorageKey,
+      value: jsonEncode({
+        'token': sessionToken,
+        'createdAt': DateTime.now().toUtc().toIso8601String(),
+        'deviceBound': account.deviceLockEnabled,
+      }),
+    );
+    _account = account;
+  }
+
+  List<int> _randomBytes(int length) {
+    final random = Random.secure();
+    return List<int>.generate(length, (_) => random.nextInt(256));
   }
 
   Future<EkoTrustEvidenceFile> _evidenceFromXFile(XFile file) async {

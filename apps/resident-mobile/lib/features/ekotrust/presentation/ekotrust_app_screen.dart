@@ -5,7 +5,7 @@ import 'package:ekotrust_mobile/features/ekotrust/application/ekotrust_controlle
 import 'package:ekotrust_mobile/features/ekotrust/domain/ekotrust_models.dart';
 import 'package:image_picker/image_picker.dart';
 
-enum EkoTrustTab { verify, home, proof, profile, status }
+enum EkoTrustTab { register, verify, home, proof, profile, status }
 
 class EkoTrustAppScreen extends StatefulWidget {
   const EkoTrustAppScreen({super.key});
@@ -16,7 +16,7 @@ class EkoTrustAppScreen extends StatefulWidget {
 
 class _EkoTrustAppScreenState extends State<EkoTrustAppScreen> {
   final EkoTrustController _controller = EkoTrustController();
-  EkoTrustTab _tab = EkoTrustTab.verify;
+  EkoTrustTab _tab = EkoTrustTab.register;
 
   @override
   void initState() {
@@ -35,6 +35,10 @@ class _EkoTrustAppScreenState extends State<EkoTrustAppScreen> {
 
   void _setTab(EkoTrustTab tab) {
     HapticFeedback.selectionClick();
+    if (!_controller.isRegistered && tab != EkoTrustTab.register) {
+      setState(() => _tab = EkoTrustTab.register);
+      return;
+    }
     setState(() => _tab = tab);
   }
 
@@ -49,6 +53,7 @@ class _EkoTrustAppScreenState extends State<EkoTrustAppScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final registered = _controller.isRegistered;
     return Scaffold(
       backgroundColor: EkoTrustTheme.deepForest,
       body: SafeArea(
@@ -64,7 +69,13 @@ class _EkoTrustAppScreenState extends State<EkoTrustAppScreen> {
                     slivers: [
                       SliverToBoxAdapter(
                         child: _EkoTopBar(
-                            onProfile: () => _setTab(EkoTrustTab.profile)),
+                          account: _controller.account,
+                          onProfile: () => _setTab(
+                            registered
+                                ? EkoTrustTab.profile
+                                : EkoTrustTab.register,
+                          ),
+                        ),
                       ),
                       SliverToBoxAdapter(child: _buildBody()),
                       const SliverToBoxAdapter(child: SizedBox(height: 94)),
@@ -76,15 +87,32 @@ class _EkoTrustAppScreenState extends State<EkoTrustAppScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: _EkoNavigation(
-        selected: _tab,
-        onSelected: _setTab,
-      ),
+      bottomNavigationBar: registered
+          ? _EkoNavigation(
+              selected:
+                  _tab == EkoTrustTab.register ? EkoTrustTab.verify : _tab,
+              onSelected: _setTab,
+            )
+          : null,
     );
   }
 
   Widget _buildBody() {
+    if (_controller.accountRestoring) {
+      return const _AccountLoadingView();
+    }
+    if (!_controller.isRegistered) {
+      return _RegistrationView(
+        controller: _controller,
+        onRegistered: () => setState(() => _tab = EkoTrustTab.verify),
+      );
+    }
     switch (_tab) {
+      case EkoTrustTab.register:
+        return _RegistrationView(
+          controller: _controller,
+          onRegistered: () => setState(() => _tab = EkoTrustTab.verify),
+        );
       case EkoTrustTab.verify:
         return _ProofOfExistenceView(
           controller: _controller,
@@ -104,9 +132,10 @@ class _EkoTrustAppScreenState extends State<EkoTrustAppScreen> {
 }
 
 class _EkoTopBar extends StatelessWidget {
-  const _EkoTopBar({required this.onProfile});
+  const _EkoTopBar({required this.onProfile, required this.account});
 
   final VoidCallback onProfile;
+  final EkoTrustAccount? account;
 
   @override
   Widget build(BuildContext context) {
@@ -137,15 +166,15 @@ class _EkoTopBar extends StatelessWidget {
                 color: EkoTrustTheme.sunGold.withValues(alpha: 0.55),
               ),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.workspace_premium_rounded,
+                const Icon(Icons.workspace_premium_rounded,
                     color: EkoTrustTheme.sunGold, size: 20),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
-                  'PREMIUM',
-                  style: TextStyle(
+                  account == null ? 'SECURE' : 'PROTECTED',
+                  style: const TextStyle(
                     color: EkoTrustTheme.sunGold,
                     fontWeight: FontWeight.w900,
                     fontSize: 12,
@@ -169,6 +198,255 @@ class _EkoTopBar extends StatelessWidget {
             icon: const Icon(Icons.person_outline_rounded),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _AccountLoadingView extends StatelessWidget {
+  const _AccountLoadingView();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(20, 90, 20, 0),
+      child: _GlassPanel(
+        child: Row(
+          children: [
+            SizedBox(
+              width: 28,
+              height: 28,
+              child: CircularProgressIndicator(strokeWidth: 3),
+            ),
+            SizedBox(width: 14),
+            Expanded(child: Text('Checking protected account storage')),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RegistrationView extends StatefulWidget {
+  const _RegistrationView({
+    required this.controller,
+    required this.onRegistered,
+  });
+
+  final EkoTrustController controller;
+  final VoidCallback onRegistered;
+
+  @override
+  State<_RegistrationView> createState() => _RegistrationViewState();
+}
+
+class _RegistrationViewState extends State<_RegistrationView> {
+  final _formKey = GlobalKey<FormState>();
+  final _name = TextEditingController();
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+  final _phone = TextEditingController();
+  final _trade = TextEditingController(text: 'Electrician');
+  final _community = TextEditingController(text: 'Yaba Artisan Circle');
+  bool _useGoogle = false;
+  bool _acceptedPrivacy = false;
+  bool _twoFactor = true;
+  bool _deviceLock = true;
+  bool _recoveryContact = true;
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _password.dispose();
+    _phone.dispose();
+    _trade.dispose();
+    _community.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    FocusScope.of(context).unfocus();
+    if (!_formKey.currentState!.validate()) return;
+    final ok = _useGoogle
+        ? await widget.controller.registerWithGoogle(
+            fullName: _name.text,
+            email: _email.text,
+            phoneNumber: _phone.text,
+            trade: _trade.text,
+            community: _community.text,
+            acceptedPrivacy: _acceptedPrivacy,
+            twoFactorEnabled: _twoFactor,
+            deviceLockEnabled: _deviceLock,
+            recoveryContactEnabled: _recoveryContact,
+          )
+        : await widget.controller.registerWithEmail(
+            EkoTrustRegistrationDraft(
+              fullName: _name.text,
+              email: _email.text,
+              password: _password.text,
+              phoneNumber: _phone.text,
+              trade: _trade.text,
+              community: _community.text,
+              acceptedPrivacy: _acceptedPrivacy,
+              twoFactorEnabled: _twoFactor,
+              deviceLockEnabled: _deviceLock,
+              recoveryContactEnabled: _recoveryContact,
+            ),
+          );
+    if (ok && mounted) widget.onRegistered();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final strength = widget.controller.passwordStrength(_password.text);
+    final registering = widget.controller.registering;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const _SectionEyebrow('Secure Registration'),
+            const SizedBox(height: 8),
+            Text(
+              'Create your protected EkoTrust account.',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    color: EkoTrustTheme.ivorySilk,
+                  ),
+            ),
+            const SizedBox(height: 14),
+            _AuthModeSwitch(
+              useGoogle: _useGoogle,
+              onChanged: (value) => setState(() => _useGoogle = value),
+            ),
+            const SizedBox(height: 14),
+            _IvoryPanel(
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _name,
+                    textCapitalization: TextCapitalization.words,
+                    decoration: const InputDecoration(
+                      labelText: 'Full legal name',
+                      prefixIcon: Icon(Icons.badge_outlined),
+                    ),
+                    validator: (value) =>
+                        (value ?? '').trim().split(RegExp(r'\s+')).length < 2
+                            ? 'Enter first and last name'
+                            : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _email,
+                    keyboardType: TextInputType.emailAddress,
+                    autofillHints: const [AutofillHints.email],
+                    decoration: InputDecoration(
+                      labelText:
+                          _useGoogle ? 'Google account email' : 'Email address',
+                      prefixIcon: const Icon(Icons.alternate_email_rounded),
+                    ),
+                    validator: (value) => RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+                            .hasMatch((value ?? '').trim())
+                        ? null
+                        : 'Enter a valid email',
+                  ),
+                  if (!_useGoogle) ...[
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _password,
+                      obscureText: true,
+                      onChanged: (_) => setState(() {}),
+                      autofillHints: const [AutofillHints.newPassword],
+                      decoration: const InputDecoration(
+                        labelText: 'Strong password',
+                        prefixIcon: Icon(Icons.lock_outline_rounded),
+                      ),
+                      validator: (value) =>
+                          widget.controller.passwordStrength(value ?? '') < 5
+                              ? 'Use 12+ chars with numbers and symbols'
+                              : null,
+                    ),
+                    const SizedBox(height: 10),
+                    _PasswordStrengthBar(score: strength),
+                  ],
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _phone,
+                    keyboardType: TextInputType.phone,
+                    autofillHints: const [AutofillHints.telephoneNumber],
+                    decoration: const InputDecoration(
+                      labelText: 'Phone number',
+                      prefixIcon: Icon(Icons.phone_android_rounded),
+                    ),
+                    validator: (value) => (value ?? '').trim().length < 10
+                        ? 'Enter your phone number'
+                        : null,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _trade,
+                          decoration: const InputDecoration(
+                            labelText: 'Trade or role',
+                            prefixIcon: Icon(Icons.handyman_rounded),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _community,
+                          decoration: const InputDecoration(
+                            labelText: 'Community',
+                            prefixIcon: Icon(Icons.groups_2_rounded),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+            _SecuritySetupPanel(
+              twoFactor: _twoFactor,
+              deviceLock: _deviceLock,
+              recoveryContact: _recoveryContact,
+              onTwoFactor: (value) => setState(() => _twoFactor = value),
+              onDeviceLock: (value) => setState(() => _deviceLock = value),
+              onRecoveryContact: (value) =>
+                  setState(() => _recoveryContact = value),
+            ),
+            const SizedBox(height: 12),
+            _ConsentCheck(
+              value: _acceptedPrivacy,
+              onChanged: (value) =>
+                  setState(() => _acceptedPrivacy = value ?? false),
+            ),
+            if (widget.controller.authMessage != null) ...[
+              const SizedBox(height: 12),
+              _AuthMessage(message: widget.controller.authMessage!),
+            ],
+            const SizedBox(height: 16),
+            _MintActionButton(
+              icon: _useGoogle
+                  ? Icons.account_circle_rounded
+                  : Icons.verified_user_rounded,
+              label: registering
+                  ? 'Securing Account'
+                  : _useGoogle
+                      ? 'Continue with Google'
+                      : 'Create Secure Account',
+              onPressed: registering ? () {} : _submit,
+            ),
+            const SizedBox(height: 18),
+            const _SecurityFooter(),
+          ],
+        ),
       ),
     );
   }
@@ -357,6 +635,13 @@ class _PublicProfileView extends StatelessWidget {
           const SizedBox(height: 12),
           _ProfileHeaderCard(profile: controller.profile),
           const SizedBox(height: 14),
+          if (controller.account != null) ...[
+            _AccountProtectionCard(
+              account: controller.account!,
+              onSignOut: controller.signOut,
+            ),
+            const SizedBox(height: 14),
+          ],
           _QrVerificationCard(handle: controller.profile.publicHandle),
           const SizedBox(height: 14),
           _WorkGalleryPanel(proofs: controller.workProofs),
@@ -487,6 +772,229 @@ class _OnboardingProgress extends StatelessWidget {
                   ),
                 )
                 .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AuthModeSwitch extends StatelessWidget {
+  const _AuthModeSwitch({required this.useGoogle, required this.onChanged});
+
+  final bool useGoogle;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return SegmentedButton<bool>(
+      segments: const [
+        ButtonSegment(
+          value: false,
+          icon: Icon(Icons.mail_lock_rounded),
+          label: Text('Email'),
+        ),
+        ButtonSegment(
+          value: true,
+          icon: Icon(Icons.account_circle_rounded),
+          label: Text('Google'),
+        ),
+      ],
+      selected: {useGoogle},
+      onSelectionChanged: (values) => onChanged(values.first),
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? EkoTrustTheme.royalMint
+              : EkoTrustTheme.ivorySilk,
+        ),
+        foregroundColor: WidgetStateProperty.all(EkoTrustTheme.deepForest),
+      ),
+    );
+  }
+}
+
+class _PasswordStrengthBar extends StatelessWidget {
+  const _PasswordStrengthBar({required this.score});
+
+  final int score;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = score >= 5 ? 'Strong password' : 'Needs stronger password';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: List.generate(6, (index) {
+            final active = index < score;
+            return Expanded(
+              child: Container(
+                height: 6,
+                margin: EdgeInsets.only(right: index == 5 ? 0 : 5),
+                decoration: BoxDecoration(
+                  color: active
+                      ? EkoTrustTheme.imperialEmerald
+                      : EkoTrustTheme.line,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            );
+          }),
+        ),
+        const SizedBox(height: 6),
+        Text(label, style: Theme.of(context).textTheme.labelMedium),
+      ],
+    );
+  }
+}
+
+class _SecuritySetupPanel extends StatelessWidget {
+  const _SecuritySetupPanel({
+    required this.twoFactor,
+    required this.deviceLock,
+    required this.recoveryContact,
+    required this.onTwoFactor,
+    required this.onDeviceLock,
+    required this.onRecoveryContact,
+  });
+
+  final bool twoFactor;
+  final bool deviceLock;
+  final bool recoveryContact;
+  final ValueChanged<bool> onTwoFactor;
+  final ValueChanged<bool> onDeviceLock;
+  final ValueChanged<bool> onRecoveryContact;
+
+  @override
+  Widget build(BuildContext context) {
+    return _GlassPanel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Account Security',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: EkoTrustTheme.ivorySilk,
+                ),
+          ),
+          const SizedBox(height: 8),
+          _SecuritySwitch(
+            icon: Icons.password_rounded,
+            title: 'OTP protection',
+            body: 'Require phone verification for risky actions.',
+            value: twoFactor,
+            onChanged: onTwoFactor,
+          ),
+          _SecuritySwitch(
+            icon: Icons.phonelink_lock_rounded,
+            title: 'Device lock',
+            body: 'Bind this session to protected device storage.',
+            value: deviceLock,
+            onChanged: onDeviceLock,
+          ),
+          _SecuritySwitch(
+            icon: Icons.contact_emergency_rounded,
+            title: 'Recovery contact',
+            body: 'Allow account recovery with trusted contact review.',
+            value: recoveryContact,
+            onChanged: onRecoveryContact,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SecuritySwitch extends StatelessWidget {
+  const _SecuritySwitch({
+    required this.icon,
+    required this.title,
+    required this.body,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final IconData icon;
+  final String title;
+  final String body;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: SwitchListTile(
+        value: value,
+        onChanged: onChanged,
+        contentPadding: EdgeInsets.zero,
+        secondary: Icon(icon, color: EkoTrustTheme.royalMint),
+        title: Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: EkoTrustTheme.ivorySilk,
+              ),
+        ),
+        subtitle: Text(
+          body,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: EkoTrustTheme.ivorySilk.withValues(alpha: 0.72),
+              ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ConsentCheck extends StatelessWidget {
+  const _ConsentCheck({required this.value, required this.onChanged});
+
+  final bool value;
+  final ValueChanged<bool?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: CheckboxListTile(
+        value: value,
+        onChanged: onChanged,
+        controlAffinity: ListTileControlAffinity.leading,
+        contentPadding: EdgeInsets.zero,
+        activeColor: EkoTrustTheme.royalMint,
+        title: Text(
+          'I agree to protect my account, verify my phone, and let EkoTrust store only the information needed for identity and work-proof safety.',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: EkoTrustTheme.ivorySilk.withValues(alpha: 0.82),
+              ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AuthMessage extends StatelessWidget {
+  const _AuthMessage({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return _GlassPanel(
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          const Icon(Icons.info_outline_rounded,
+              color: EkoTrustTheme.sunGold, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: EkoTrustTheme.ivorySilk,
+                  ),
+            ),
           ),
         ],
       ),
@@ -974,6 +1482,72 @@ class _ProfileHeaderCard extends StatelessWidget {
   }
 }
 
+class _AccountProtectionCard extends StatelessWidget {
+  const _AccountProtectionCard({
+    required this.account,
+    required this.onSignOut,
+  });
+
+  final EkoTrustAccount account;
+  final Future<void> Function() onSignOut;
+
+  @override
+  Widget build(BuildContext context) {
+    return _GlassPanel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const _EmeraldIcon(Icons.security_rounded),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${account.firstName} account protected',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: EkoTrustTheme.ivorySilk,
+                          ),
+                    ),
+                    Text(
+                      '${account.providerLabel} sign-in - ${account.phoneNumber}',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color:
+                                EkoTrustTheme.ivorySilk.withValues(alpha: 0.72),
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              _SmallPill('${account.securityScore}%'),
+            ],
+          ),
+          const SizedBox(height: 14),
+          _CheckLine(account.twoFactorEnabled
+              ? 'OTP protection enabled'
+              : 'OTP protection needs review'),
+          _CheckLine(account.deviceLockEnabled
+              ? 'Secure device storage enabled'
+              : 'Device binding needs review'),
+          _CheckLine(account.recoveryContactEnabled
+              ? 'Recovery contact review enabled'
+              : 'Add recovery contact before launch'),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () async => onSignOut(),
+              icon: const Icon(Icons.logout_rounded),
+              label: const Text('Sign out'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _QrVerificationCard extends StatelessWidget {
   const _QrVerificationCard({required this.handle});
 
@@ -1132,9 +1706,16 @@ class _EkoNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const tabs = [
+      EkoTrustTab.verify,
+      EkoTrustTab.home,
+      EkoTrustTab.proof,
+      EkoTrustTab.profile,
+      EkoTrustTab.status,
+    ];
     return NavigationBar(
-      selectedIndex: EkoTrustTab.values.indexOf(selected),
-      onDestinationSelected: (index) => onSelected(EkoTrustTab.values[index]),
+      selectedIndex: tabs.indexOf(selected).clamp(0, tabs.length - 1),
+      onDestinationSelected: (index) => onSelected(tabs[index]),
       destinations: const [
         NavigationDestination(
             icon: Icon(Icons.fingerprint_rounded), label: 'Verify'),

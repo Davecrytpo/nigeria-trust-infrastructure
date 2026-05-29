@@ -11,6 +11,7 @@ To build a digital coordination layer for society, established through five foun
 - **Source:** Full recovery of the 15-section Master Architecture & Operational Blueprint (2026-05-20).
 - **Foundation:** All product, architecture, and operational documents are strictly aligned with the master blueprint.
 - **Prototype:** A runnable "Proof of Concept" (Resident PWA + Ops Console) is available to demonstrate basic incident flows.
+- **Mobile:** `apps/resident-mobile/` now contains the Android-first Flutter EkoTrust app for secure account registration, verification onboarding, proof-of-work evidence, and reputation profiles.
 - **Roadmap:** The project has entered Infrastructure Execution Phase. The priority is now operational reliability, field validation, governance, and survivability under Nigerian conditions.
 
 ## Technical Alignment (Section 11)
@@ -35,6 +36,25 @@ npm.cmd start
 ```
 
 Operator routes require the access key: `yaba-ops-demo-key`.
+
+## EkoTrust Mobile
+
+The Android-first resident mobile app is in `apps/resident-mobile/`. The current MVP includes:
+
+- Secure email registration with local protected storage, password strength validation, device-lock/session controls, and sign-out.
+- Optional Google-style registration flow placeholder for linked identity onboarding.
+- Verification onboarding for phone, liveness, community, and profile checks.
+- Before/after visual Proof of Work capture with cryptographic evidence hashing and upload status.
+- Trust score, verification level, attestations, proof timeline, and shareable artisan profile views.
+
+Run it locally with:
+
+```bash
+cd apps/resident-mobile
+flutter pub get
+flutter test
+flutter build apk --debug
+```
 
 ## Field Survivability Drills
 
@@ -256,6 +276,7 @@ docker compose -f compose.production.yaml -f compose.observability.yaml up -d
 ## Project Structure
 
 - `apps/resident-pwa/`: Web-based resident interface (PoC).
+- `apps/resident-mobile/`: Android-first Flutter EkoTrust resident app.
 - `apps/ops-console/`: Web-based operator dashboard (PoC).
 - `services/api/`: Node.js prototype API.
 - `packages/shared-types/`: Shared domain definitions.

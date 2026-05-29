@@ -4,6 +4,103 @@ enum EkoTrustVerificationLevel { bronze, silver, gold, platinum }
 
 enum EkoTrustProofStatus { passed, pending, flagged }
 
+enum EkoTrustAccountProvider { manual, google }
+
+class EkoTrustAccount {
+  const EkoTrustAccount({
+    required this.fullName,
+    required this.email,
+    required this.phoneNumber,
+    required this.trade,
+    required this.community,
+    required this.provider,
+    required this.twoFactorEnabled,
+    required this.deviceLockEnabled,
+    required this.recoveryContactEnabled,
+  });
+
+  final String fullName;
+  final String email;
+  final String phoneNumber;
+  final String trade;
+  final String community;
+  final EkoTrustAccountProvider provider;
+  final bool twoFactorEnabled;
+  final bool deviceLockEnabled;
+  final bool recoveryContactEnabled;
+
+  String get providerLabel =>
+      provider == EkoTrustAccountProvider.google ? 'Google' : 'Email';
+
+  String get firstName {
+    final trimmed = fullName.trim();
+    if (trimmed.isEmpty) return 'Resident';
+    return trimmed.split(RegExp(r'\s+')).first;
+  }
+
+  int get securityScore {
+    var score = 62;
+    if (twoFactorEnabled) score += 16;
+    if (deviceLockEnabled) score += 12;
+    if (recoveryContactEnabled) score += 10;
+    return score.clamp(0, 100);
+  }
+
+  Map<String, dynamic> toJson() => {
+        'fullName': fullName,
+        'email': email,
+        'phoneNumber': phoneNumber,
+        'trade': trade,
+        'community': community,
+        'provider': provider.name,
+        'twoFactorEnabled': twoFactorEnabled,
+        'deviceLockEnabled': deviceLockEnabled,
+        'recoveryContactEnabled': recoveryContactEnabled,
+      };
+
+  factory EkoTrustAccount.fromJson(Map<String, dynamic> json) {
+    return EkoTrustAccount(
+      fullName: (json['fullName'] ?? '').toString(),
+      email: (json['email'] ?? '').toString(),
+      phoneNumber: (json['phoneNumber'] ?? '').toString(),
+      trade: (json['trade'] ?? '').toString(),
+      community: (json['community'] ?? '').toString(),
+      provider: (json['provider'] ?? '') == EkoTrustAccountProvider.google.name
+          ? EkoTrustAccountProvider.google
+          : EkoTrustAccountProvider.manual,
+      twoFactorEnabled: json['twoFactorEnabled'] == true,
+      deviceLockEnabled: json['deviceLockEnabled'] != false,
+      recoveryContactEnabled: json['recoveryContactEnabled'] == true,
+    );
+  }
+}
+
+class EkoTrustRegistrationDraft {
+  const EkoTrustRegistrationDraft({
+    required this.fullName,
+    required this.email,
+    required this.password,
+    required this.phoneNumber,
+    required this.trade,
+    required this.community,
+    required this.acceptedPrivacy,
+    required this.twoFactorEnabled,
+    required this.deviceLockEnabled,
+    required this.recoveryContactEnabled,
+  });
+
+  final String fullName;
+  final String email;
+  final String password;
+  final String phoneNumber;
+  final String trade;
+  final String community;
+  final bool acceptedPrivacy;
+  final bool twoFactorEnabled;
+  final bool deviceLockEnabled;
+  final bool recoveryContactEnabled;
+}
+
 class EkoTrustOnboardingStep {
   const EkoTrustOnboardingStep({
     required this.shortLabel,
