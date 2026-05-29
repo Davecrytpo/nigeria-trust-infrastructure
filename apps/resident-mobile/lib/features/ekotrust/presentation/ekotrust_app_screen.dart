@@ -4,6 +4,7 @@ import 'package:ekotrust_mobile/core/presentation/ekotrust_theme.dart';
 import 'package:ekotrust_mobile/features/ekotrust/application/ekotrust_controller.dart';
 import 'package:ekotrust_mobile/features/ekotrust/domain/ekotrust_models.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 enum EkoTrustTab { register, verify, home, proof, profile, status }
 
@@ -251,7 +252,6 @@ class _RegistrationViewState extends State<_RegistrationView> {
   final _phone = TextEditingController();
   final _trade = TextEditingController(text: 'Electrician');
   final _community = TextEditingController(text: 'Yaba Artisan Circle');
-  bool _useGoogle = false;
   bool _acceptedPrivacy = false;
   bool _twoFactor = true;
   bool _deviceLock = true;
@@ -271,32 +271,20 @@ class _RegistrationViewState extends State<_RegistrationView> {
   Future<void> _submit() async {
     FocusScope.of(context).unfocus();
     if (!_formKey.currentState!.validate()) return;
-    final ok = _useGoogle
-        ? await widget.controller.registerWithGoogle(
-            fullName: _name.text,
-            email: _email.text,
-            phoneNumber: _phone.text,
-            trade: _trade.text,
-            community: _community.text,
-            acceptedPrivacy: _acceptedPrivacy,
-            twoFactorEnabled: _twoFactor,
-            deviceLockEnabled: _deviceLock,
-            recoveryContactEnabled: _recoveryContact,
-          )
-        : await widget.controller.registerWithEmail(
-            EkoTrustRegistrationDraft(
-              fullName: _name.text,
-              email: _email.text,
-              password: _password.text,
-              phoneNumber: _phone.text,
-              trade: _trade.text,
-              community: _community.text,
-              acceptedPrivacy: _acceptedPrivacy,
-              twoFactorEnabled: _twoFactor,
-              deviceLockEnabled: _deviceLock,
-              recoveryContactEnabled: _recoveryContact,
-            ),
-          );
+    final ok = await widget.controller.registerWithEmail(
+      EkoTrustRegistrationDraft(
+        fullName: _name.text,
+        email: _email.text,
+        password: _password.text,
+        phoneNumber: _phone.text,
+        trade: _trade.text,
+        community: _community.text,
+        acceptedPrivacy: _acceptedPrivacy,
+        twoFactorEnabled: _twoFactor,
+        deviceLockEnabled: _deviceLock,
+        recoveryContactEnabled: _recoveryContact,
+      ),
+    );
     if (ok && mounted) widget.onRegistered();
   }
 
@@ -320,11 +308,6 @@ class _RegistrationViewState extends State<_RegistrationView> {
                   ),
             ),
             const SizedBox(height: 14),
-            _AuthModeSwitch(
-              useGoogle: _useGoogle,
-              onChanged: (value) => setState(() => _useGoogle = value),
-            ),
-            const SizedBox(height: 14),
             _IvoryPanel(
               child: Column(
                 children: [
@@ -345,35 +328,32 @@ class _RegistrationViewState extends State<_RegistrationView> {
                     controller: _email,
                     keyboardType: TextInputType.emailAddress,
                     autofillHints: const [AutofillHints.email],
-                    decoration: InputDecoration(
-                      labelText:
-                          _useGoogle ? 'Google account email' : 'Email address',
-                      prefixIcon: const Icon(Icons.alternate_email_rounded),
+                    decoration: const InputDecoration(
+                      labelText: 'Email address',
+                      prefixIcon: Icon(Icons.alternate_email_rounded),
                     ),
                     validator: (value) => RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
                             .hasMatch((value ?? '').trim())
                         ? null
                         : 'Enter a valid email',
                   ),
-                  if (!_useGoogle) ...[
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: _password,
-                      obscureText: true,
-                      onChanged: (_) => setState(() {}),
-                      autofillHints: const [AutofillHints.newPassword],
-                      decoration: const InputDecoration(
-                        labelText: 'Strong password',
-                        prefixIcon: Icon(Icons.lock_outline_rounded),
-                      ),
-                      validator: (value) =>
-                          widget.controller.passwordStrength(value ?? '') < 5
-                              ? 'Use 12+ chars with numbers and symbols'
-                              : null,
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _password,
+                    obscureText: true,
+                    onChanged: (_) => setState(() {}),
+                    autofillHints: const [AutofillHints.newPassword],
+                    decoration: const InputDecoration(
+                      labelText: 'Strong password',
+                      prefixIcon: Icon(Icons.lock_outline_rounded),
                     ),
-                    const SizedBox(height: 10),
-                    _PasswordStrengthBar(score: strength),
-                  ],
+                    validator: (value) =>
+                        widget.controller.passwordStrength(value ?? '') < 5
+                            ? 'Use 12+ chars with numbers and symbols'
+                            : null,
+                  ),
+                  const SizedBox(height: 10),
+                  _PasswordStrengthBar(score: strength),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _phone,
@@ -436,14 +416,8 @@ class _RegistrationViewState extends State<_RegistrationView> {
             ],
             const SizedBox(height: 16),
             _MintActionButton(
-              icon: _useGoogle
-                  ? Icons.account_circle_rounded
-                  : Icons.verified_user_rounded,
-              label: registering
-                  ? 'Securing Account'
-                  : _useGoogle
-                      ? 'Continue with Google'
-                      : 'Create Secure Account',
+              icon: Icons.verified_user_rounded,
+              label: registering ? 'Securing Account' : 'Create Secure Account',
               onPressed: registering ? () {} : _submit,
             ),
             const SizedBox(height: 18),
@@ -777,41 +751,6 @@ class _OnboardingProgress extends StatelessWidget {
                 .toList(),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _AuthModeSwitch extends StatelessWidget {
-  const _AuthModeSwitch({required this.useGoogle, required this.onChanged});
-
-  final bool useGoogle;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return SegmentedButton<bool>(
-      segments: const [
-        ButtonSegment(
-          value: false,
-          icon: Icon(Icons.mail_lock_rounded),
-          label: Text('Email'),
-        ),
-        ButtonSegment(
-          value: true,
-          icon: Icon(Icons.account_circle_rounded),
-          label: Text('Google'),
-        ),
-      ],
-      selected: {useGoogle},
-      onSelectionChanged: (values) => onChanged(values.first),
-      style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected)
-              ? EkoTrustTheme.royalMint
-              : EkoTrustTheme.ivorySilk,
-        ),
-        foregroundColor: WidgetStateProperty.all(EkoTrustTheme.deepForest),
       ),
     );
   }
@@ -1558,17 +1497,33 @@ class _QrVerificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final verificationUrl =
+        handle.startsWith('http') ? handle : 'https://$handle';
     return _GlassPanel(
       child: Row(
         children: [
           Container(
-            width: 86,
-            height: 86,
+            width: 104,
+            height: 104,
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: EkoTrustTheme.ivorySilk,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: EkoTrustTheme.sunGold, width: 1.3),
             ),
-            child: CustomPaint(painter: _QrPainter()),
+            child: QrImageView(
+              data: verificationUrl,
+              version: QrVersions.auto,
+              backgroundColor: EkoTrustTheme.ivorySilk,
+              eyeStyle: const QrEyeStyle(
+                eyeShape: QrEyeShape.square,
+                color: EkoTrustTheme.deepForest,
+              ),
+              dataModuleStyle: const QrDataModuleStyle(
+                dataModuleShape: QrDataModuleShape.square,
+                color: EkoTrustTheme.deepForest,
+              ),
+            ),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -1581,11 +1536,15 @@ class _QrVerificationCard extends StatelessWidget {
                         )),
                 const SizedBox(height: 4),
                 Text(
-                  handle,
+                  verificationUrl,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: EkoTrustTheme.ivorySilk.withValues(alpha: 0.72),
                       ),
                 ),
+                const SizedBox(height: 8),
+                const _SmallPill('Scan to verify'),
               ],
             ),
           ),
@@ -2311,64 +2270,6 @@ class _InstitutionPainter extends CustomPainter {
       ..quadraticBezierTo(size.width * 0.58, size.height * 0.30,
           size.width * 0.72, size.height * 0.26);
     canvas.drawPath(shield, shieldPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _QrPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = EkoTrustTheme.deepForest;
-    const modules = [
-      [0, 0],
-      [1, 0],
-      [2, 0],
-      [0, 1],
-      [2, 1],
-      [0, 2],
-      [1, 2],
-      [2, 2],
-      [6, 0],
-      [7, 0],
-      [8, 0],
-      [6, 1],
-      [8, 1],
-      [6, 2],
-      [7, 2],
-      [8, 2],
-      [0, 6],
-      [1, 6],
-      [2, 6],
-      [0, 7],
-      [2, 7],
-      [0, 8],
-      [1, 8],
-      [2, 8],
-      [4, 4],
-      [5, 4],
-      [7, 4],
-      [3, 5],
-      [6, 5],
-      [8, 5],
-      [4, 6],
-      [5, 7],
-      [7, 7],
-      [4, 8],
-      [6, 8],
-    ];
-    final cell = size.width / 10;
-    for (final item in modules) {
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromLTWH((item[0] + 0.7) * cell, (item[1] + 0.7) * cell,
-              cell * 0.72, cell * 0.72),
-          const Radius.circular(1.5),
-        ),
-        paint,
-      );
-    }
   }
 
   @override

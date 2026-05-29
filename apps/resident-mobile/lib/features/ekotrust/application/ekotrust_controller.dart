@@ -114,19 +114,39 @@ class EkoTrustController extends ChangeNotifier {
   EkoTrustOnboardingStep get currentStep =>
       onboardingSteps[_onboardingStep.clamp(0, onboardingSteps.length - 1)];
 
-  EkoTrustProfile get profile => const EkoTrustProfile(
-        id: 'art-yaba-electrician-001',
-        name: 'Chinedu Okafor',
-        trade: 'Verified Electrician',
-        community: 'Yaba Artisan Circle',
-        location: 'Lagos Mainland',
-        trustScore: 86,
-        completionRate: 96,
-        verifiedJobs: 47,
-        peerAttestations: 18,
-        verificationLevel: EkoTrustVerificationLevel.gold,
-        publicHandle: 'ekotrust.ng/chinedu-okafor',
+  EkoTrustProfile get profile {
+    final account = _account;
+    if (account == null) {
+      return const EkoTrustProfile(
+        id: 'resident-unverified',
+        name: 'New EkoTrust Member',
+        trade: 'Verified Artisan',
+        community: 'Unassigned Community',
+        location: 'Nigeria',
+        trustScore: 0,
+        completionRate: 0,
+        verifiedJobs: 0,
+        peerAttestations: 0,
+        verificationLevel: EkoTrustVerificationLevel.bronze,
+        publicHandle: 'ekotrust.ng/profile/new-member',
       );
+    }
+
+    final slug = _profileSlug(account.fullName);
+    return EkoTrustProfile(
+      id: 'resident-$slug',
+      name: account.fullName,
+      trade: _verifiedTradeLabel(account.trade),
+      community: account.community,
+      location: account.community,
+      trustScore: account.securityScore,
+      completionRate: 0,
+      verifiedJobs: 0,
+      peerAttestations: account.recoveryContactEnabled ? 1 : 0,
+      verificationLevel: EkoTrustVerificationLevel.bronze,
+      publicHandle: 'ekotrust.ng/profile/$slug',
+    );
+  }
 
   List<EkoTrustWorkProof> get workProofs => const [
         EkoTrustWorkProof(
@@ -217,60 +237,6 @@ class EkoTrustController extends ChangeNotifier {
     await _storeAccount(account, password: draft.password);
     _registering = false;
     _authMessage = 'Account protected. Continue verification.';
-    notifyListeners();
-    return true;
-  }
-
-  Future<bool> registerWithGoogle({
-    required String fullName,
-    required String email,
-    required String phoneNumber,
-    required String trade,
-    required String community,
-    required bool acceptedPrivacy,
-    bool twoFactorEnabled = true,
-    bool deviceLockEnabled = true,
-    bool recoveryContactEnabled = true,
-  }) async {
-    final draft = EkoTrustRegistrationDraft(
-      fullName: fullName,
-      email: email,
-      password: 'GoogleAuth#${DateTime.now().microsecondsSinceEpoch}',
-      phoneNumber: phoneNumber,
-      trade: trade,
-      community: community,
-      acceptedPrivacy: acceptedPrivacy,
-      twoFactorEnabled: twoFactorEnabled,
-      deviceLockEnabled: deviceLockEnabled,
-      recoveryContactEnabled: recoveryContactEnabled,
-    );
-    final validation = validateRegistration(draft);
-    if (validation != null) {
-      _authMessage = validation;
-      notifyListeners();
-      return false;
-    }
-
-    _registering = true;
-    _authMessage = 'Linking Google identity';
-    notifyListeners();
-
-    await _storeAccount(
-      EkoTrustAccount(
-        fullName: fullName.trim(),
-        email: email.trim().toLowerCase(),
-        phoneNumber: phoneNumber.trim(),
-        trade: trade.trim(),
-        community: community.trim(),
-        provider: EkoTrustAccountProvider.google,
-        twoFactorEnabled: twoFactorEnabled,
-        deviceLockEnabled: deviceLockEnabled,
-        recoveryContactEnabled: recoveryContactEnabled,
-      ),
-      password: draft.password,
-    );
-    _registering = false;
-    _authMessage = 'Google account linked. Continue verification.';
     notifyListeners();
     return true;
   }
@@ -534,6 +500,21 @@ class EkoTrustController extends ChangeNotifier {
   List<int> _randomBytes(int length) {
     final random = Random.secure();
     return List<int>.generate(length, (_) => random.nextInt(256));
+  }
+
+  String _profileSlug(String name) {
+    final slug = name
+        .trim()
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
+        .replaceAll(RegExp(r'^-+|-+$'), '');
+    return slug.isEmpty ? 'resident' : slug;
+  }
+
+  String _verifiedTradeLabel(String trade) {
+    final normalized = trade.trim();
+    if (normalized.isEmpty) return 'Verified Artisan';
+    return 'Verified $normalized';
   }
 
   Future<EkoTrustEvidenceFile> _evidenceFromXFile(XFile file) async {

@@ -328,7 +328,13 @@ class _LoginFormState extends State<_LoginForm> {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () {
-                // TODO: forgot password flow
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Password recovery will be connected before launch.',
+                    ),
+                  ),
+                );
               },
               child: const Text(
                 'Forgot password?',
@@ -348,16 +354,6 @@ class _LoginFormState extends State<_LoginForm> {
             icon: Icons.login_rounded,
             label: busy ? 'Signing In...' : 'Sign In',
             onPressed: busy ? null : _submit,
-          ),
-          const SizedBox(height: 16),
-          _DividerOr(),
-          const SizedBox(height: 16),
-          _GoogleButton(
-            onPressed: busy
-                ? null
-                : () async {
-                    // TODO: Google Sign-In
-                  },
           ),
           const SizedBox(height: 28),
           Wrap(
@@ -663,58 +659,6 @@ class _PrimaryButton extends StatelessWidget {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
       ),
-    );
-  }
-}
-
-class _GoogleButton extends StatelessWidget {
-  const _GoogleButton({required this.onPressed});
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 52,
-      child: OutlinedButton.icon(
-        icon: const Icon(Icons.account_circle_rounded, size: 22),
-        label: const Text('Continue with Google',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
-        onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          foregroundColor: EkoTrustTheme.ivorySilk,
-          side: BorderSide(
-              color: EkoTrustTheme.ivorySilk.withValues(alpha: 0.35)),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        ),
-      ),
-    );
-  }
-}
-
-class _DividerOr extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-            child: Divider(
-                color: EkoTrustTheme.ivorySilk.withValues(alpha: 0.22))),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          child: Text(
-            'or',
-            style: TextStyle(
-              color: EkoTrustTheme.ivorySilk.withValues(alpha: 0.55),
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        Expanded(
-            child: Divider(
-                color: EkoTrustTheme.ivorySilk.withValues(alpha: 0.22))),
-      ],
     );
   }
 }

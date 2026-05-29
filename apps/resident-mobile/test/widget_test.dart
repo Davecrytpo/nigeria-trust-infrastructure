@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:ekotrust_mobile/features/ekotrust/application/ekotrust_controller.dart';
 import 'package:ekotrust_mobile/features/ekotrust/domain/ekotrust_models.dart';
 import 'package:ekotrust_mobile/main.dart';
 
@@ -97,7 +98,7 @@ void main() {
 
     expect(find.text('Welcome back.'), findsOneWidget);
     expect(find.text('Sign In'), findsWidgets);
-    expect(find.text('Continue with Google'), findsOneWidget);
+    expect(find.text('Continue with Google'), findsNothing);
 
     await tester.tap(find.text('Create Account').first);
     await tester.pumpAndSettle();
@@ -123,4 +124,37 @@ void main() {
     expect(profile.verificationLevel, EkoTrustVerificationLevel.gold);
     expect(profile.initials, 'CO');
   });
+
+  test('EkoTrust profile uses the registered account identity', () async {
+    FlutterSecureStorage.setMockInitialValues({});
+    final controller = EkoTrustController();
+    addTearDown(controller.dispose);
+    await testerPumpMicrotasks();
+
+    final ok = await controller.registerWithEmail(
+      const EkoTrustRegistrationDraft(
+        fullName: 'Aisha Balogun',
+        email: 'aisha@example.com',
+        password: 'EkoTrust#2026Safe',
+        phoneNumber: '08031234567',
+        trade: 'Tailor',
+        community: 'Yaba Market Circle',
+        acceptedPrivacy: true,
+        twoFactorEnabled: true,
+        deviceLockEnabled: true,
+        recoveryContactEnabled: true,
+      ),
+    );
+
+    expect(ok, isTrue);
+    expect(controller.profile.name, 'Aisha Balogun');
+    expect(controller.profile.trade, 'Verified Tailor');
+    expect(
+        controller.profile.publicHandle, 'ekotrust.ng/profile/aisha-balogun');
+    expect(controller.profile.verifiedJobs, 0);
+  });
+}
+
+Future<void> testerPumpMicrotasks() async {
+  await Future<void>.delayed(Duration.zero);
 }
