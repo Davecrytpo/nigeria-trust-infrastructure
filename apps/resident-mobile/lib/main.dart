@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ekotrust_mobile/core/presentation/ekotrust_theme.dart';
-import 'package:ekotrust_mobile/features/ekotrust/presentation/ekotrust_app_screen.dart';
+import 'package:ekotrust_mobile/features/ekotrust/presentation/splash_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +19,7 @@ class EkoTrustApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: EkoTrustTheme.light(),
-      home: const EkoTrustAppScreen(),
+      home: const SplashScreen(),
     );
   }
 }

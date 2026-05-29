@@ -12,8 +12,11 @@ void main() {
 
   Future<void> registerResident(WidgetTester tester) async {
     await tester.pumpWidget(const EkoTrustApp());
+    await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
 
+    await tester.tap(find.text('Create Account').first);
+    await tester.pumpAndSettle();
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Full legal name'),
       'Chinedu Okafor',
@@ -23,20 +26,25 @@ void main() {
       'chinedu@example.com',
     );
     await tester.enterText(
-      find.widgetWithText(TextFormField, 'Strong password'),
+      find.widgetWithText(TextFormField, 'Password'),
       'EkoTrust#2026Safe',
     );
     await tester.enterText(
-      find.widgetWithText(TextFormField, 'Phone number'),
+      find.widgetWithText(TextFormField, 'Phone number (+234...)'),
       '08031234567',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Trade or role (e.g. Electrician)'),
+      'Electrician',
     );
     await tester.ensureVisible(find.byType(CheckboxListTile));
     await tester.pumpAndSettle();
     await tester.tap(find.byType(CheckboxListTile));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('Create Secure Account'));
+    await tester
+        .ensureVisible(find.widgetWithText(FilledButton, 'Create Account'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Create Secure Account'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Create Account'));
     await tester.pumpAndSettle();
   }
 
@@ -77,21 +85,24 @@ void main() {
     expect(find.text('VERIFICATION STATUS'), findsOneWidget);
   });
 
-  testWidgets('EkoTrust starts with secure account registration',
+  testWidgets('EkoTrust starts with splash and login gate',
       (WidgetTester tester) async {
     await tester.binding.setSurfaceSize(const Size(430, 1200));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await tester.pumpWidget(const EkoTrustApp());
+    expect(find.text('EkoTrust'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
 
-    expect(find.text('SECURE REGISTRATION'), findsOneWidget);
-    expect(find.text('Create Secure Account'), findsOneWidget);
-    expect(find.text('Continue with Google'), findsNothing);
-
-    await tester.tap(find.text('Google'));
-    await tester.pumpAndSettle();
-
+    expect(find.text('Welcome back.'), findsOneWidget);
+    expect(find.text('Sign In'), findsWidgets);
     expect(find.text('Continue with Google'), findsOneWidget);
+
+    await tester.tap(find.text('Create Account').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Create your account.'), findsOneWidget);
   });
 
   test('EkoTrust profile maps API payload into mobile model', () {

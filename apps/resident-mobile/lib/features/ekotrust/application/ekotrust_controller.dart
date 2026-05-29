@@ -275,6 +275,73 @@ class EkoTrustController extends ChangeNotifier {
     return true;
   }
 
+  /// Sign in with email and password.
+  /// Looks up the stored account, verifies password hash, restores session.
+  Future<bool> loginWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    _registering = true;
+    _authMessage = 'Checking credentials';
+    notifyListeners();
+
+    try {
+      final payload = await _secureStorage.read(key: _accountStorageKey);
+      if (payload == null) {
+        _registering = false;
+        _authMessage = 'No account found. Please register first.';
+        notifyListeners();
+        return false;
+      }
+      final json = jsonDecode(payload) as Map<String, dynamic>;
+      final storedEmail = (json['email'] as String?) ?? '';
+      if (storedEmail.toLowerCase() != email.toLowerCase().trim()) {
+        _registering = false;
+        _authMessage = 'Incorrect email or password.';
+        notifyListeners();
+        return false;
+      }
+      // Verify password hash
+      final saltHex = (json['passwordSalt'] as String?) ?? '';
+      final proofHex = (json['passwordProof'] as String?) ?? '';
+      final salt = List<int>.generate(saltHex.length ~/ 2,
+          (i) => int.parse(saltHex.substring(i * 2, i * 2 + 2), radix: 16));
+      final secretKey = await Pbkdf2(
+        macAlgorithm: Hmac.sha256(),
+        iterations: 120000,
+        bits: 256,
+      ).deriveKey(
+        secretKey: SecretKey(utf8.encode(password)),
+        nonce: salt,
+      );
+      final hash = hexFromBytes(await secretKey.extractBytes());
+      if (hash != proofHex) {
+        _registering = false;
+        _authMessage = 'Incorrect email or password.';
+        notifyListeners();
+        return false;
+      }
+      _account = EkoTrustAccount.fromJson(json);
+      final sessionToken = hexFromBytes(_randomBytes(32));
+      await _secureStorage.write(
+        key: _sessionStorageKey,
+        value: jsonEncode({
+          'token': sessionToken,
+          'createdAt': DateTime.now().toUtc().toIso8601String(),
+        }),
+      );
+      _registering = false;
+      _authMessage = null;
+      notifyListeners();
+      return true;
+    } catch (_) {
+      _registering = false;
+      _authMessage = 'Sign in failed. Please try again.';
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<void> signOut() async {
     await _secureStorage.delete(key: _sessionStorageKey);
     _account = null;

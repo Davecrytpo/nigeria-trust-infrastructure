@@ -16,7 +16,7 @@ class EkoTrustAppScreen extends StatefulWidget {
 
 class _EkoTrustAppScreenState extends State<EkoTrustAppScreen> {
   final EkoTrustController _controller = EkoTrustController();
-  EkoTrustTab _tab = EkoTrustTab.register;
+  EkoTrustTab _tab = EkoTrustTab.verify;
 
   @override
   void initState() {
@@ -156,34 +156,37 @@ class _EkoTopBar extends StatelessWidget {
                   ),
             ),
           ),
-          Container(
-            height: 42,
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(28),
-              color: EkoTrustTheme.sunGold.withValues(alpha: 0.12),
-              border: Border.all(
-                color: EkoTrustTheme.sunGold.withValues(alpha: 0.55),
+          if (account != null)
+            Container(
+              height: 38,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                color: EkoTrustTheme.sunGold.withValues(alpha: 0.12),
+                border: Border.all(
+                  color: EkoTrustTheme.sunGold.withValues(alpha: 0.55),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.workspace_premium_rounded,
+                      color: EkoTrustTheme.sunGold, size: 18),
+                  const SizedBox(width: 6),
+                  Text(
+                    account!.trade.isNotEmpty
+                        ? account!.trade.split(' ').first.toUpperCase()
+                        : 'PREMIUM',
+                    style: const TextStyle(
+                      color: EkoTrustTheme.sunGold,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 11,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ],
               ),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.workspace_premium_rounded,
-                    color: EkoTrustTheme.sunGold, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  account == null ? 'SECURE' : 'PROTECTED',
-                  style: const TextStyle(
-                    color: EkoTrustTheme.sunGold,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 12,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ],
-            ),
-          ),
           const SizedBox(width: 10),
           IconButton.filledTonal(
             tooltip: 'Public profile',
