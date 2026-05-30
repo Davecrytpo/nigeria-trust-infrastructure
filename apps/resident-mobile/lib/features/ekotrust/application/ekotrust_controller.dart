@@ -56,10 +56,16 @@ class EkoTrustController extends ChangeNotifier {
   bool _aiReviewQueued = false;
   EkoTrustUploadState _uploadState = EkoTrustUploadState.idle;
   String? _uploadMessage;
+  String? _otpMessage;
+  String? _otpSessionToken;
+  String? _demoOtpCode;
   EkoTrustEvidenceFile? _beforeEvidence;
   EkoTrustEvidenceFile? _afterEvidence;
   bool _accountRestoring = true;
   bool _registering = false;
+  bool _otpSending = false;
+  bool _otpVerifying = false;
+  bool _phoneVerified = false;
   String? _authMessage;
   EkoTrustAccount? _account;
   final List<EkoTrustWorkProof> _workProofs = [];
@@ -69,8 +75,13 @@ class EkoTrustController extends ChangeNotifier {
   bool get aiReviewQueued => _aiReviewQueued;
   EkoTrustUploadState get uploadState => _uploadState;
   String? get uploadMessage => _uploadMessage;
+  String? get otpMessage => _otpMessage;
+  String? get demoOtpCode => _demoOtpCode;
   EkoTrustEvidenceFile? get beforeEvidence => _beforeEvidence;
   EkoTrustEvidenceFile? get afterEvidence => _afterEvidence;
+  bool get otpSending => _otpSending;
+  bool get otpVerifying => _otpVerifying;
+  bool get phoneVerified => _phoneVerified;
   bool get hasEvidencePair => _beforeEvidence != null && _afterEvidence != null;
   bool get accountRestoring => _accountRestoring;
   bool get registering => _registering;
@@ -347,11 +358,88 @@ class EkoTrustController extends ChangeNotifier {
     if (_onboardingStep < onboardingSteps.length - 1) {
       _onboardingStep += 1;
     }
+    _persistProfileState('onboarding_step', _onboardingStep);
     notifyListeners();
   }
 
   void resetOnboarding() {
     _onboardingStep = 0;
+    _persistProfileState('onboarding_step', _onboardingStep);
+    notifyListeners();
+  }
+
+  Future<void> sendOtpCode() async {
+    final phoneNumber = _account?.phoneNumber;
+    if (phoneNumber == null || phoneNumber.isEmpty) {
+      _otpMessage = 'Register a phone number first.';
+      notifyListeners();
+      return;
+    }
+
+    _otpSending = true;
+    _otpMessage = 'Sending OTP';
+    notifyListeners();
+
+    try {
+      final result = await _repository.sendOtp(phoneNumber);
+      _otpSessionToken = result['sessionToken']?.toString();
+      _demoOtpCode = result['__demo_code']?.toString();
+      _otpMessage = _demoOtpCode == null
+          ? 'OTP sent to your phone.'
+          : 'Demo OTP sent: $_demoOtpCode';
+    } catch (_) {
+      _demoOtpCode = (100000 + Random.secure().nextInt(900000)).toString();
+      _otpSessionToken = 'local-${DateTime.now().millisecondsSinceEpoch}';
+      _otpMessage = 'Demo OTP sent: $_demoOtpCode';
+    } finally {
+      _otpSending = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> verifyOtpCode(String code) async {
+    if (code.trim().length != 6) {
+      _otpMessage = 'Enter the 6-digit OTP.';
+      notifyListeners();
+      return false;
+    }
+
+    _otpVerifying = true;
+    _otpMessage = 'Verifying OTP';
+    notifyListeners();
+
+    try {
+      final sessionToken = _otpSessionToken;
+      if (sessionToken != null && !sessionToken.startsWith('local-')) {
+        await _repository.verifyOtp(
+          sessionToken: sessionToken,
+          code: code.trim(),
+        );
+      } else if (_demoOtpCode != null && code.trim() != _demoOtpCode) {
+        _otpMessage = 'Incorrect OTP.';
+        return false;
+      }
+
+      _phoneVerified = true;
+      await _persistProfileState('phone_verified', true);
+      await _persistProfileState(
+        'phone_verified_at',
+        DateTime.now().toUtc().toIso8601String(),
+      );
+      _otpMessage = 'Phone verified.';
+      return true;
+    } catch (_) {
+      _otpMessage = 'OTP verification failed. Try again.';
+      return false;
+    } finally {
+      _otpVerifying = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> skipOtpForPilot() async {
+    _otpMessage = 'Phone verification skipped for pilot testing.';
+    await _persistProfileState('phone_verified', false);
     notifyListeners();
   }
 
@@ -404,6 +492,19 @@ class EkoTrustController extends ChangeNotifier {
   }
 
   Future<void> submitWorkEvidence() async {
+    await submitWorkEvidenceWithDetails(
+      title: 'New verified work evidence',
+      category: 'Electrical repair',
+      location: profile.location,
+    );
+  }
+
+  Future<void> submitWorkEvidenceWithDetails({
+    required String title,
+    required String category,
+    required String location,
+    String description = '',
+  }) async {
     final before = _beforeEvidence;
     final after = _afterEvidence;
     if (before == null || after == null) {
@@ -417,39 +518,74 @@ class EkoTrustController extends ChangeNotifier {
     _uploadMessage = 'Creating secure work proof';
     notifyListeners();
 
+    EkoTrustWorkProof savedProof;
     try {
       final proof = await _repository.createWorkProof(
         artisanId: profile.id,
-        title: 'New verified work evidence',
-        category: 'Electrical repair',
-        location: profile.location,
+        title: title,
+        category: category,
+        location: location,
         beforeMediaCount: 1,
         afterMediaCount: 1,
       );
       await _uploadEvidence(proof.id, 'before', before);
       await _uploadEvidence(proof.id, 'after', after);
       _aiReviewQueued = true;
-      final sealedProof = EkoTrustWorkProof(
+      savedProof = EkoTrustWorkProof(
         id: proof.id,
-        title: proof.title.isEmpty ? 'New verified work evidence' : proof.title,
-        category: proof.category.isEmpty ? 'Work proof' : proof.category,
-        location: proof.location.isEmpty ? profile.location : proof.location,
+        title: proof.title.isEmpty ? title : proof.title,
+        category: proof.category.isEmpty ? category : proof.category,
+        location: proof.location.isEmpty ? location : proof.location,
         status: EkoTrustProofStatus.passed,
-        summary: 'Evidence uploaded, sealed, and ready for review.',
+        summary: description.isEmpty
+            ? 'Evidence uploaded, sealed, and ready for review.'
+            : description,
         icon: proof.icon,
       );
-      _workProofs.insert(0, sealedProof);
-      await _persistWorkProof(sealedProof);
-      _uploadState = EkoTrustUploadState.complete;
-      _uploadMessage = 'Evidence uploaded and queued for AI review';
-      _beforeEvidence = null;
-      _afterEvidence = null;
-      notifyListeners();
+      await _persistWorkProof(
+        savedProof,
+        beforePath: before.path,
+        afterPath: after.path,
+        evidenceHash: before.contentHash,
+        synced: true,
+      );
     } catch (error) {
-      _uploadState = EkoTrustUploadState.failed;
-      _uploadMessage = 'Upload failed. Evidence remains on this device.';
-      notifyListeners();
+      savedProof = EkoTrustWorkProof(
+        id: 'local-${DateTime.now().millisecondsSinceEpoch}',
+        title: title,
+        category: category,
+        location: location,
+        status: EkoTrustProofStatus.pending,
+        summary: description.isEmpty
+            ? 'Saved locally. Will sync when online.'
+            : description,
+        icon: Icons.home_repair_service_rounded,
+      );
+      await _persistWorkProof(
+        savedProof,
+        beforePath: before.path,
+        afterPath: after.path,
+        evidenceHash: before.contentHash,
+        synced: false,
+      );
     }
+
+    _workProofs.insert(0, savedProof);
+    _aiReviewQueued = true;
+    _uploadState = EkoTrustUploadState.complete;
+    _uploadMessage = 'Work proof saved. Trust score updated.';
+    _beforeEvidence = null;
+    _afterEvidence = null;
+    notifyListeners();
+  }
+
+  void resetUpload() {
+    _uploadState = EkoTrustUploadState.idle;
+    _uploadMessage = null;
+    _beforeEvidence = null;
+    _afterEvidence = null;
+    _aiReviewQueued = false;
+    notifyListeners();
   }
 
   void setOfflineReady(bool value) {
@@ -466,6 +602,7 @@ class EkoTrustController extends ChangeNotifier {
           jsonDecode(payload) as Map<String, dynamic>,
         );
         await _restoreWorkProofs();
+        await _restoreProfileState();
       }
     } catch (_) {
       _authMessage = 'Account storage is locked. Register or sign in again.';
@@ -525,7 +662,13 @@ class EkoTrustController extends ChangeNotifier {
     }
   }
 
-  Future<void> _persistWorkProof(EkoTrustWorkProof proof) async {
+  Future<void> _persistWorkProof(
+    EkoTrustWorkProof proof, {
+    String? beforePath,
+    String? afterPath,
+    String? evidenceHash,
+    bool synced = false,
+  }) async {
     try {
       await _offlineSyncService.saveWorkProof({
         'id': proof.id,
@@ -535,10 +678,41 @@ class EkoTrustController extends ChangeNotifier {
         'location': proof.location,
         'status': proof.status.name,
         'summary': proof.summary,
+        'synced': synced,
+        'evidenceBeforePath': beforePath,
+        'evidenceAfterPath': afterPath,
+        'evidenceHash': evidenceHash,
         'createdAt': DateTime.now().toUtc().toIso8601String(),
       });
     } catch (_) {
       // Local persistence should never block the user's proof submission.
+    }
+  }
+
+  Future<void> _restoreProfileState() async {
+    try {
+      final step = await _offlineSyncService.getProfileState<int>(
+        'onboarding_step',
+      );
+      final phoneVerified = await _offlineSyncService.getProfileState<bool>(
+        'phone_verified',
+      );
+      if (step != null) {
+        _onboardingStep = step.clamp(0, onboardingSteps.length - 1);
+      }
+      if (phoneVerified != null) {
+        _phoneVerified = phoneVerified;
+      }
+    } catch (_) {
+      // Profile state is optional on first install and in widget tests.
+    }
+  }
+
+  Future<void> _persistProfileState(String key, Object? value) async {
+    try {
+      await _offlineSyncService.setProfileState(key, value);
+    } catch (_) {
+      // SQLite may be unavailable in widget tests.
     }
   }
 

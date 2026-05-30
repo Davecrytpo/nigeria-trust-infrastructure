@@ -566,6 +566,38 @@ export function createStore(options = {}) {
     return eventInfrastructure.reconstructIncidentTimeline(incidentId);
   }
 
+  const otpSessions = new Map();
+  const workProofs = new Map();
+
+  async function setOtpSession(token, data) {
+    otpSessions.set(token, clone(data));
+  }
+
+  async function getOtpSession(token) {
+    const session = otpSessions.get(token);
+    return session ? clone(session) : null;
+  }
+
+  async function updateOtpSession(token, data) {
+    otpSessions.set(token, clone(data));
+  }
+
+  async function deleteOtpSession(token) {
+    otpSessions.delete(token);
+  }
+
+  async function saveWorkProof(proof) {
+    workProofs.set(proof.id, clone(proof));
+    return clone(proof);
+  }
+
+  async function listWorkProofs(artisanId) {
+    return [...workProofs.values()]
+      .filter((proof) => proof.artisanId === artisanId)
+      .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
+      .map(clone);
+  }
+
   return {
     createIncident,
     claimOperatorQueueItem,
@@ -580,6 +612,12 @@ export function createStore(options = {}) {
     reassignOperatorQueueItem,
     releaseOperatorQueueItem,
     resolveIncident,
+    setOtpSession,
+    getOtpSession,
+    updateOtpSession,
+    deleteOtpSession,
+    saveWorkProof,
+    listWorkProofs,
     eventInfrastructure,
     stateFile
   };

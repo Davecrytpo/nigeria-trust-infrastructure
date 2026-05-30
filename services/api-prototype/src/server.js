@@ -1,5 +1,6 @@
 import http from "node:http";
 import { readFile } from "node:fs/promises";
+import { randomBytes } from "node:crypto";
 import { extname, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { methodNotAllowed, notFound, parseJsonBody, securityHeaders, sendJson, sendText } from "./lib/http.js";
@@ -54,6 +55,10 @@ function writeSse(response, event, data, id = Date.now().toString()) {
   response.write(`id: ${id}\n`);
   response.write(`event: ${event}\n`);
   response.write(`data: ${JSON.stringify(data)}\n\n`);
+}
+
+function createProofId() {
+  return `proof-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
 export function createAppServer(options = {}) {
@@ -463,6 +468,187 @@ export function createAppServer(options = {}) {
         }
 
         methodNotAllowed(response);
+        return;
+      }
+
+      if (pathname === "/api/trust/otp/send") {
+        if (request.method !== "POST") {
+          methodNotAllowed(response);
+          return;
+        }
+
+        if (!enforceRateLimit(request, response, "otp-send")) {
+          return;
+        }
+
+        const payload = await parseJsonBody(request);
+        const phoneNumber = String(payload.phoneNumber ?? "").replace(/[\s-]/g, "");
+        if (!/^(\+234|0)[789][01]\d{8}$/.test(phoneNumber)) {
+          sendJson(response, 422, {
+            error: "Enter a valid Nigerian phone number.",
+            code: "INVALID_PHONE"
+          });
+          return;
+        }
+
+        const code = String(Math.floor(100000 + Math.random() * 900000));
+        const sessionToken = randomBytes(24).toString("hex");
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+        await store.setOtpSession(sessionToken, {
+          phoneNumber,
+          code,
+          attempts: 0,
+          expiresAt
+        });
+
+        sendJson(response, 200, {
+          sessionToken,
+          expiresAt,
+          __demo_code: process.env.NODE_ENV === "production" ? undefined : code
+        });
+        return;
+      }
+
+      if (pathname === "/api/trust/otp/verify") {
+        if (request.method !== "POST") {
+          methodNotAllowed(response);
+          return;
+        }
+
+        if (!enforceRateLimit(request, response, "otp-verify")) {
+          return;
+        }
+
+        const payload = await parseJsonBody(request);
+        const sessionToken = String(payload.sessionToken ?? "");
+        const code = String(payload.code ?? "");
+        const session = await store.getOtpSession(sessionToken);
+        if (!session) {
+          sendJson(response, 401, {
+            error: "Session expired or invalid.",
+            code: "SESSION_INVALID"
+          });
+          return;
+        }
+
+        if (new Date(session.expiresAt).getTime() <= Date.now()) {
+          await store.deleteOtpSession(sessionToken);
+          sendJson(response, 401, {
+            error: "Code expired. Request a new one.",
+            code: "CODE_EXPIRED"
+          });
+          return;
+        }
+
+        if (session.attempts >= 5) {
+          await store.deleteOtpSession(sessionToken);
+          sendJson(response, 429, {
+            error: "Too many attempts. Request a new code.",
+            code: "TOO_MANY_ATTEMPTS"
+          });
+          return;
+        }
+
+        if (session.code !== code) {
+          const attempts = session.attempts + 1;
+          await store.updateOtpSession(sessionToken, {
+            ...session,
+            attempts
+          });
+          sendJson(response, 401, {
+            error: "Incorrect code.",
+            code: "CODE_INCORRECT",
+            attemptsRemaining: Math.max(0, 5 - attempts)
+          });
+          return;
+        }
+
+        await store.deleteOtpSession(sessionToken);
+        sendJson(response, 200, {
+          verified: true,
+          phoneNumber: session.phoneNumber
+        });
+        return;
+      }
+
+      if (pathname === "/api/trust/proofs") {
+        if (request.method !== "POST") {
+          methodNotAllowed(response);
+          return;
+        }
+
+        if (!enforceRateLimit(request, response, "proof-create")) {
+          return;
+        }
+
+        const payload = await parseJsonBody(request);
+        const proof = await store.saveWorkProof({
+          id: createProofId(),
+          artisanId: String(payload.artisanId ?? ""),
+          title: String(payload.title ?? "Work proof"),
+          category: String(payload.category ?? "General"),
+          location: String(payload.location ?? "Lagos"),
+          status: "AI_PASSED",
+          summary: "Evidence captured and queued for review.",
+          createdAt: new Date().toISOString()
+        });
+        broadcast("trust.proof.created", proof);
+        sendJson(response, 201, proof);
+        return;
+      }
+
+      const trustProofsMatch = pathname.match(/^\/api\/trust\/profiles\/([^/]+)\/proofs$/);
+      if (trustProofsMatch) {
+        if (request.method !== "GET") {
+          methodNotAllowed(response);
+          return;
+        }
+
+        sendJson(response, 200, await store.listWorkProofs(trustProofsMatch[1]));
+        return;
+      }
+
+      if (pathname === "/api/trust/media/upload-intents") {
+        if (request.method !== "POST") {
+          methodNotAllowed(response);
+          return;
+        }
+
+        const payload = await parseJsonBody(request);
+        const proofId = String(payload.proofId ?? "proof");
+        const role = String(payload.mediaRole ?? "evidence");
+        const host = request.headers.host ?? `127.0.0.1:${Number(process.env.PORT ?? 3000)}`;
+        sendJson(response, 201, {
+          uploadUrl: `http://${host}/api/trust/media/upload/${proofId}/${role}`,
+          storageKey: `${proofId}/${role}`
+        });
+        return;
+      }
+
+      const mediaUploadMatch = pathname.match(/^\/api\/trust\/media\/upload\/([^/]+)\/([^/]+)$/);
+      if (mediaUploadMatch) {
+        if (request.method !== "PUT" && request.method !== "POST") {
+          methodNotAllowed(response);
+          return;
+        }
+
+        sendJson(response, 200, {
+          uploaded: true,
+          storageKey: `${mediaUploadMatch[1]}/${mediaUploadMatch[2]}`
+        });
+        return;
+      }
+
+      if (pathname === "/api/trust/media") {
+        if (request.method !== "POST") {
+          methodNotAllowed(response);
+          return;
+        }
+
+        sendJson(response, 201, {
+          registered: true,
+          ...(await parseJsonBody(request))
+        });
         return;
       }
 

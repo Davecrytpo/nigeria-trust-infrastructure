@@ -45,6 +45,10 @@ class _EkoTrustAppScreenState extends State<EkoTrustAppScreen> {
 
   void _advanceVerification() {
     HapticFeedback.lightImpact();
+    if (_controller.onboardingStep == 0) {
+      _controller.sendOtpCode();
+      _controller.skipOtpForPilot();
+    }
     if (_controller.onboardingStep < _controller.onboardingSteps.length - 1) {
       _controller.advanceOnboarding();
       return;
@@ -473,6 +477,10 @@ class _ProofOfExistenceView extends StatelessWidget {
           const _TrustPromiseCard(),
           const SizedBox(height: 22),
           _VerificationStepCard(step: current),
+          if (controller.otpMessage != null) ...[
+            const SizedBox(height: 12),
+            _AuthMessage(message: controller.otpMessage!),
+          ],
           const SizedBox(height: 18),
           _MintActionButton(
             icon: step == 0
@@ -552,45 +560,283 @@ class _TrustDashboardView extends StatelessWidget {
   }
 }
 
-class _VisualProofView extends StatelessWidget {
+const _kTradeCategories = [
+  'Electrical Repair',
+  'Plumbing',
+  'Carpentry & Joinery',
+  'Painting & Decoration',
+  'Roofing & Waterproofing',
+  'Tiling & Flooring',
+  'Welding & Fabrication',
+  'AC & Refrigeration',
+  'Generator Repair',
+  'Masonry & Bricklaying',
+  'Interior Design',
+  'Landscaping',
+  'Other',
+];
+
+const _kLagosAreas = [
+  'Yaba',
+  'Surulere',
+  'Lekki Phase 1',
+  'Lekki Phase 2',
+  'Victoria Island',
+  'Ikeja',
+  'Ojodu',
+  'Agege',
+  'Isale Eko',
+  'Apapa',
+  'Festac',
+  'Ikorodu',
+  'Epe',
+  'Badagry',
+  'Oshodi',
+  'Mushin',
+  'Maryland',
+  'Magodo',
+  'Gbagada',
+  'Ojota',
+  'Ketu',
+  'Mile 12',
+  'Ilupeju',
+  'Anthony',
+  'Oregun',
+  'Other',
+];
+
+class _VisualProofView extends StatefulWidget {
   const _VisualProofView({required this.controller});
 
   final EkoTrustController controller;
 
   @override
+  State<_VisualProofView> createState() => _VisualProofViewState();
+}
+
+class _VisualProofViewState extends State<_VisualProofView> {
+  final _formKey = GlobalKey<FormState>();
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  String? _category;
+  String? _location;
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    FocusScope.of(context).unfocus();
+    if (!_formKey.currentState!.validate()) return;
+    if (!widget.controller.hasEvidencePair) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Add before and after evidence first.')),
+      );
+      return;
+    }
+
+    await widget.controller.submitWorkEvidenceWithDetails(
+      title: _titleController.text.trim(),
+      category: _category!,
+      location: _location!,
+      description: _descriptionController.text.trim(),
+    );
+
+    if (!mounted ||
+        widget.controller.uploadState != EkoTrustUploadState.complete) {
+      return;
+    }
+
+    final proof = widget.controller.workProofs.isEmpty
+        ? null
+        : widget.controller.workProofs.first;
+    if (proof != null) {
+      _showAttestationSheet(proof);
+    }
+  }
+
+  void _showAttestationSheet(EkoTrustWorkProof proof) {
+    final id = proof.id.length <= 8 ? proof.id : proof.id.substring(0, 8);
+    final link = 'https://${widget.controller.profile.publicHandle}/attest/$id';
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: EkoTrustTheme.imperialEmerald,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 34),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Request peer attestation',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: EkoTrustTheme.ivorySilk,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Share this 72-hour link with the customer or guild peer who can confirm the work.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: EkoTrustTheme.ivorySilk.withValues(alpha: 0.78),
+                  ),
+            ),
+            const SizedBox(height: 14),
+            SelectableText(
+              link,
+              style: const TextStyle(
+                color: EkoTrustTheme.royalMint,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: link));
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Attestation link copied')),
+                );
+              },
+              icon: const Icon(Icons.copy_rounded),
+              label: const Text('Copy attestation link'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final controller = widget.controller;
+    final uploading = controller.uploadState == EkoTrustUploadState.uploading;
+    final complete = controller.uploadState == EkoTrustUploadState.complete;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const _SectionEyebrow('Visual Proof of Work'),
-          const SizedBox(height: 8),
-          Text(
-            'Capture the job. Build the record.',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: EkoTrustTheme.ivorySilk,
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const _SectionEyebrow('Visual Proof of Work'),
+            const SizedBox(height: 8),
+            Text(
+              'Capture the job. Build the record.',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    color: EkoTrustTheme.ivorySilk,
+                  ),
+            ),
+            const SizedBox(height: 16),
+            if (!complete) ...[
+              _IvoryPanel(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Job Details',
+                        style: Theme.of(context).textTheme.titleLarge),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _titleController,
+                      textCapitalization: TextCapitalization.sentences,
+                      decoration: const InputDecoration(
+                        labelText: 'Job title',
+                        prefixIcon: Icon(Icons.work_outline_rounded),
+                      ),
+                      validator: (value) => (value ?? '').trim().length < 5
+                          ? 'Enter a clear job title'
+                          : null,
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      initialValue: _category,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Trade category',
+                        prefixIcon: Icon(Icons.handyman_rounded),
+                      ),
+                      items: _kTradeCategories
+                          .map(
+                            (category) => DropdownMenuItem(
+                              value: category,
+                              child: Text(category),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) => setState(() => _category = value),
+                      validator: (value) =>
+                          value == null ? 'Select a trade category' : null,
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      initialValue: _location,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Lagos location',
+                        prefixIcon: Icon(Icons.location_on_outlined),
+                      ),
+                      items: _kLagosAreas
+                          .map(
+                            (area) => DropdownMenuItem(
+                              value: area,
+                              child: Text(area),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) => setState(() => _location = value),
+                      validator: (value) =>
+                          value == null ? 'Select a job location' : null,
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _descriptionController,
+                      maxLines: 2,
+                      textCapitalization: TextCapitalization.sentences,
+                      decoration: const InputDecoration(
+                        labelText: 'Description (optional)',
+                        prefixIcon: Icon(Icons.notes_rounded),
+                      ),
+                    ),
+                  ],
                 ),
-          ),
-          const SizedBox(height: 16),
-          _BeforeAfterCapture(controller: controller),
-          const SizedBox(height: 14),
-          _UploadStatusPanel(controller: controller),
-          const SizedBox(height: 14),
-          _AiReviewPanel(queued: controller.aiReviewQueued),
-          const SizedBox(height: 14),
-          _MintActionButton(
-            icon: controller.uploadState == EkoTrustUploadState.uploading
-                ? Icons.sync_rounded
-                : Icons.cloud_upload_rounded,
-            label: controller.uploadState == EkoTrustUploadState.uploading
-                ? 'Uploading Evidence'
-                : 'Upload Work Evidence',
-            onPressed: controller.uploadState == EkoTrustUploadState.uploading
-                ? () {}
-                : controller.submitWorkEvidence,
-          ),
-        ],
+              ),
+              const SizedBox(height: 14),
+            ],
+            _BeforeAfterCapture(controller: controller),
+            const SizedBox(height: 14),
+            _UploadStatusPanel(controller: controller),
+            const SizedBox(height: 14),
+            _AiReviewPanel(queued: controller.aiReviewQueued),
+            const SizedBox(height: 14),
+            _MintActionButton(
+              icon: uploading ? Icons.sync_rounded : Icons.cloud_upload_rounded,
+              label: uploading ? 'Uploading Evidence' : 'Submit Work Proof',
+              onPressed: uploading ? () {} : _submit,
+            ),
+            if (complete) ...[
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                onPressed: () {
+                  controller.resetUpload();
+                  _titleController.clear();
+                  _descriptionController.clear();
+                  setState(() {
+                    _category = null;
+                    _location = null;
+                  });
+                },
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('Submit another proof'),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

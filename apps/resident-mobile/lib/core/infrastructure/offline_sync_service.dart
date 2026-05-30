@@ -31,7 +31,7 @@ class OfflineSyncService {
 
     final db = await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -62,6 +62,7 @@ class OfflineSyncService {
     ''');
 
     await _createWorkProofsTable(db);
+    await _createProfileStateTable(db);
   }
 
   Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
@@ -72,6 +73,16 @@ class OfflineSyncService {
     }
     if (oldVersion < 3) {
       await _createWorkProofsTable(db);
+    }
+    if (oldVersion < 4) {
+      await _createProfileStateTable(db);
+      await _addColumnIfMissing(
+          db, 'work_proofs', 'synced', 'INTEGER NOT NULL DEFAULT 0');
+      await _addColumnIfMissing(
+          db, 'work_proofs', 'evidence_before_path', 'TEXT');
+      await _addColumnIfMissing(
+          db, 'work_proofs', 'evidence_after_path', 'TEXT');
+      await _addColumnIfMissing(db, 'work_proofs', 'evidence_hash', 'TEXT');
     }
   }
 
@@ -85,6 +96,10 @@ class OfflineSyncService {
         location TEXT NOT NULL,
         status TEXT NOT NULL,
         summary TEXT NOT NULL,
+        synced INTEGER NOT NULL DEFAULT 0,
+        evidence_before_path TEXT,
+        evidence_after_path TEXT,
+        evidence_hash TEXT,
         created_at TEXT NOT NULL
       )
     ''');
@@ -93,6 +108,29 @@ class OfflineSyncService {
       CREATE INDEX IF NOT EXISTS work_proofs_artisan_created_idx
       ON work_proofs(artisan_id, created_at DESC)
     ''');
+  }
+
+  Future<void> _createProfileStateTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS profile_state (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      )
+    ''');
+  }
+
+  Future<void> _addColumnIfMissing(
+    Database db,
+    String table,
+    String column,
+    String definition,
+  ) async {
+    final rows = await db.rawQuery('PRAGMA table_info($table)');
+    final exists = rows.any((row) => row['name'] == column);
+    if (!exists) {
+      await db.execute('ALTER TABLE $table ADD COLUMN $column $definition');
+    }
   }
 
   Future<void> recoverInterruptedUploads() async {
@@ -247,6 +285,13 @@ class OfflineSyncService {
         'location': proof['location'].toString(),
         'status': proof['status'].toString(),
         'summary': proof['summary'].toString(),
+        'synced': proof['synced'] == true ? 1 : 0,
+        if (proof['evidenceBeforePath'] != null)
+          'evidence_before_path': proof['evidenceBeforePath'].toString(),
+        if (proof['evidenceAfterPath'] != null)
+          'evidence_after_path': proof['evidenceAfterPath'].toString(),
+        if (proof['evidenceHash'] != null)
+          'evidence_hash': proof['evidenceHash'].toString(),
         'created_at': (proof['createdAt'] ?? now).toString(),
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
@@ -272,10 +317,53 @@ class OfflineSyncService {
             'location': row['location'],
             'status': row['status'],
             'summary': row['summary'],
+            'synced': row['synced'],
+            'evidenceBeforePath': row['evidence_before_path'],
+            'evidenceAfterPath': row['evidence_after_path'],
+            'evidenceHash': row['evidence_hash'],
             'createdAt': row['created_at'],
           },
         )
         .toList(growable: false);
+  }
+
+  Future<void> markWorkProofSynced(String id) async {
+    final db = await database;
+    await db.update(
+      'work_proofs',
+      {'synced': 1},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> setProfileState(String key, Object? value) async {
+    final db = await database;
+    await db.insert(
+      'profile_state',
+      {
+        'key': key,
+        'value': jsonEncode(value),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<T?> getProfileState<T>(String key) async {
+    final db = await database;
+    final rows = await db.query(
+      'profile_state',
+      where: 'key = ?',
+      whereArgs: [key],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    try {
+      return jsonDecode(rows.first['value'].toString()) as T?;
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<String> _encryptJson(Map<String, dynamic> payload) async {

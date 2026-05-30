@@ -60,6 +60,24 @@ class EkoTrustApiRepository {
     );
   }
 
+  Future<Map<String, dynamic>> sendOtp(String phoneNumber) async {
+    final response = await _post('/trust/otp/send', {
+      'phoneNumber': phoneNumber,
+    });
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> verifyOtp({
+    required String sessionToken,
+    required String code,
+  }) async {
+    final response = await _post('/trust/otp/verify', {
+      'sessionToken': sessionToken,
+      'code': code,
+    });
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
+
   Future<Map<String, dynamic>> createMediaUploadIntent({
     required String proofId,
     required String mediaRole,

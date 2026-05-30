@@ -475,6 +475,105 @@ test("mobile sync suppresses duplicate offline replay mutations", async () => {
   });
 });
 
+test("trust OTP send and verify flow enforces code attempts", async () => {
+  await withServer(async (baseUrl) => {
+    const sendResponse = await fetch(`${baseUrl}/api/trust/otp/send`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        phoneNumber: "08031234567"
+      })
+    });
+    const sendBody = await sendResponse.json();
+    const wrongResponse = await fetch(`${baseUrl}/api/trust/otp/verify`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        sessionToken: sendBody.sessionToken,
+        code: "000000"
+      })
+    });
+    const wrongBody = await wrongResponse.json();
+    const verifyResponse = await fetch(`${baseUrl}/api/trust/otp/verify`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        sessionToken: sendBody.sessionToken,
+        code: sendBody.__demo_code
+      })
+    });
+    const verifyBody = await verifyResponse.json();
+
+    assert.equal(sendResponse.status, 200);
+    assert.match(sendBody.sessionToken, /^[a-f0-9]+$/);
+    assert.equal(wrongResponse.status, 401);
+    assert.equal(wrongBody.attemptsRemaining, 4);
+    assert.equal(verifyResponse.status, 200);
+    assert.equal(verifyBody.verified, true);
+  });
+});
+
+test("trust proof creation persists by artisan and accepts media registration", async () => {
+  await withServer(async (baseUrl) => {
+    const createResponse = await fetch(`${baseUrl}/api/trust/proofs`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        artisanId: "resident-aisha",
+        title: "Yaba shop lighting repair",
+        category: "Electrical Repair",
+        location: "Yaba"
+      })
+    });
+    const proof = await createResponse.json();
+    const uploadIntentResponse = await fetch(`${baseUrl}/api/trust/media/upload-intents`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        proofId: proof.id,
+        mediaRole: "before"
+      })
+    });
+    const uploadIntent = await uploadIntentResponse.json();
+    const uploadResponse = await fetch(uploadIntent.uploadUrl, {
+      method: "PUT",
+      body: "test-image"
+    });
+    const mediaResponse = await fetch(`${baseUrl}/api/trust/media`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        proofId: proof.id,
+        mediaRole: "before",
+        storageKey: uploadIntent.storageKey
+      })
+    });
+    const listResponse = await fetch(`${baseUrl}/api/trust/profiles/resident-aisha/proofs`);
+    const listBody = await listResponse.json();
+
+    assert.equal(createResponse.status, 201);
+    assert.equal(proof.title, "Yaba shop lighting repair");
+    assert.equal(uploadIntentResponse.status, 201);
+    assert.equal(uploadResponse.status, 200);
+    assert.equal(mediaResponse.status, 201);
+    assert.equal(listResponse.status, 200);
+    assert.equal(listBody.length, 1);
+    assert.equal(listBody[0].id, proof.id);
+  });
+});
+
 test("incidents persist to the local state file", async () => {
   await withServer(async (baseUrl, context) => {
     const createResponse = await fetch(`${baseUrl}/api/incidents`, {
