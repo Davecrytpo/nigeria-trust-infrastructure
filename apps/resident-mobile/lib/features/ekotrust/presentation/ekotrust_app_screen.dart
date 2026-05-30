@@ -1082,35 +1082,40 @@ class _TrustScoreCard extends StatelessWidget {
     return _IvoryPanel(
       child: Row(
         children: [
-          SizedBox(
-            width: 118,
-            height: 118,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                CircularProgressIndicator(
-                  value: profile.trustScore / 100,
-                  strokeWidth: 10,
-                  backgroundColor:
-                      EkoTrustTheme.imperialEmerald.withValues(alpha: 0.12),
-                  color: EkoTrustTheme.royalMint,
-                ),
-                Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${profile.trustScore}',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
-                      Text(
-                        'Trust Score',
-                        style: Theme.of(context).textTheme.labelMedium,
-                      ),
-                    ],
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: profile.trustScore / 100),
+            duration: const Duration(milliseconds: 1000),
+            curve: Curves.easeOutCubic,
+            builder: (context, value, _) => SizedBox(
+              width: 118,
+              height: 118,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  CircularProgressIndicator(
+                    value: value,
+                    strokeWidth: 10,
+                    backgroundColor:
+                        EkoTrustTheme.imperialEmerald.withValues(alpha: 0.12),
+                    color: EkoTrustTheme.royalMint,
                   ),
-                ),
-              ],
+                  Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '${(value * 100).round()}',
+                          style: Theme.of(context).textTheme.headlineMedium,
+                        ),
+                        Text(
+                          'Trust Score',
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(width: 18),
@@ -1192,12 +1197,18 @@ class _RecentWorkPanel extends StatelessWidget {
         children: [
           Text('Recent Work', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 12),
-          for (final proof in proofs.take(3))
-            _WorkRow(
-              icon: proof.icon,
-              title: proof.title,
-              meta: '${proof.statusLabel} - ${proof.location}',
-            ),
+          if (proofs.isEmpty)
+            Text(
+              'Submit your first before-and-after proof to start building your score.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            )
+          else
+            for (final proof in proofs.take(3))
+              _WorkRow(
+                icon: proof.icon,
+                title: proof.title,
+                meta: '${proof.statusLabel} - ${proof.location}',
+              ),
         ],
       ),
     );
@@ -1589,6 +1600,10 @@ class _StatusTierCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final jobs = profile.verifiedJobs;
+    final tierProgress = _tierProgress(jobs);
+    final nextGoal = _nextTierGoal(jobs);
+
     return _IvoryPanel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1607,20 +1622,41 @@ class _StatusTierCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          LinearProgressIndicator(
-            value: 0.68,
-            minHeight: 9,
-            borderRadius: BorderRadius.circular(12),
-            backgroundColor:
-                EkoTrustTheme.imperialEmerald.withValues(alpha: 0.12),
-            color: EkoTrustTheme.royalMint,
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: tierProgress),
+            duration: const Duration(milliseconds: 900),
+            curve: Curves.easeOutCubic,
+            builder: (context, value, _) => LinearProgressIndicator(
+              value: value,
+              minHeight: 9,
+              borderRadius: BorderRadius.circular(12),
+              backgroundColor:
+                  EkoTrustTheme.imperialEmerald.withValues(alpha: 0.12),
+              color: EkoTrustTheme.royalMint,
+            ),
           ),
           const SizedBox(height: 8),
-          Text('12 more verified jobs and 3 peer attestations to Platinum.',
-              style: Theme.of(context).textTheme.bodyMedium),
+          Text(nextGoal, style: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
     );
+  }
+
+  double _tierProgress(int jobs) {
+    if (jobs < 5) return jobs / 5;
+    if (jobs < 20) return (jobs - 5) / 15;
+    if (jobs < 60) return (jobs - 20) / 40;
+    return 1;
+  }
+
+  String _nextTierGoal(int jobs) {
+    if (jobs < 5) {
+      final remaining = 5 - jobs;
+      return '$remaining more verified job${remaining == 1 ? '' : 's'} to Silver.';
+    }
+    if (jobs < 20) return '${20 - jobs} more verified jobs to Gold.';
+    if (jobs < 60) return '${60 - jobs} more verified jobs to Platinum.';
+    return 'Platinum achieved - highest trust level unlocked.';
   }
 }
 

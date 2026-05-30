@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:cryptography/cryptography.dart';
+import 'package:ekotrust_mobile/core/infrastructure/offline_sync_service.dart';
 import 'package:ekotrust_mobile/features/ekotrust/infrastructure/ekotrust_api_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -36,10 +37,12 @@ class EkoTrustController extends ChangeNotifier {
     ImagePicker? imagePicker,
     http.Client? uploadClient,
     FlutterSecureStorage? secureStorage,
+    OfflineSyncService? offlineSyncService,
   })  : _repository = repository ?? EkoTrustApiRepository(),
         _imagePicker = imagePicker ?? ImagePicker(),
         _uploadClient = uploadClient ?? http.Client(),
-        _secureStorage = secureStorage ?? const FlutterSecureStorage() {
+        _secureStorage = secureStorage ?? const FlutterSecureStorage(),
+        _offlineSyncService = offlineSyncService ?? OfflineSyncService() {
     _restoreSecureAccount();
   }
 
@@ -47,6 +50,7 @@ class EkoTrustController extends ChangeNotifier {
   final ImagePicker _imagePicker;
   final http.Client _uploadClient;
   final FlutterSecureStorage _secureStorage;
+  final OfflineSyncService _offlineSyncService;
   int _onboardingStep = 0;
   bool _offlineReady = true;
   bool _aiReviewQueued = false;
@@ -58,6 +62,7 @@ class EkoTrustController extends ChangeNotifier {
   bool _registering = false;
   String? _authMessage;
   EkoTrustAccount? _account;
+  final List<EkoTrustWorkProof> _workProofs = [];
 
   int get onboardingStep => _onboardingStep;
   bool get offlineReady => _offlineReady;
@@ -118,10 +123,10 @@ class EkoTrustController extends ChangeNotifier {
     final account = _account;
     if (account == null) {
       return const EkoTrustProfile(
-        id: 'resident-unverified',
-        name: 'New EkoTrust Member',
-        trade: 'Verified Artisan',
-        community: 'Unassigned Community',
+        id: '',
+        name: 'Your Name',
+        trade: 'Your Trade',
+        community: 'Your Community',
         location: 'Nigeria',
         trustScore: 0,
         completionRate: 0,
@@ -133,50 +138,41 @@ class EkoTrustController extends ChangeNotifier {
     }
 
     final slug = _profileSlug(account.fullName);
+    final verifiedJobs = _workProofs
+        .where((proof) => proof.status != EkoTrustProofStatus.flagged)
+        .length;
+    final trustScore = _computeTrustScore(verifiedJobs, _onboardingStep);
     return EkoTrustProfile(
       id: 'resident-$slug',
       name: account.fullName,
       trade: _verifiedTradeLabel(account.trade),
-      community: account.community,
-      location: account.community,
-      trustScore: account.securityScore,
-      completionRate: 0,
-      verifiedJobs: 0,
+      community: account.community.isEmpty
+          ? 'Lagos Artisan Network'
+          : account.community,
+      location: 'Lagos, Nigeria',
+      trustScore: trustScore,
+      completionRate: verifiedJobs == 0 ? 0 : 100,
+      verifiedJobs: verifiedJobs,
       peerAttestations: account.recoveryContactEnabled ? 1 : 0,
-      verificationLevel: EkoTrustVerificationLevel.bronze,
+      verificationLevel: _computeLevel(verifiedJobs, _onboardingStep),
       publicHandle: 'ekotrust.ng/profile/$slug',
     );
   }
 
-  List<EkoTrustWorkProof> get workProofs => const [
-        EkoTrustWorkProof(
-          id: 'proof-001',
-          title: 'Lekki apartment rewiring',
-          category: 'Electrical repair',
-          location: 'Lekki Phase 1',
-          status: EkoTrustProofStatus.passed,
-          summary: 'Customer confirmed and before/after evidence sealed.',
-          icon: Icons.electrical_services_rounded,
-        ),
-        EkoTrustWorkProof(
-          id: 'proof-002',
-          title: 'Inverter fault repair',
-          category: 'Power systems',
-          location: 'Yaba',
-          status: EkoTrustProofStatus.passed,
-          summary: 'Duplicate-work scan passed with GPS consistency.',
-          icon: Icons.bolt_rounded,
-        ),
-        EkoTrustWorkProof(
-          id: 'proof-003',
-          title: 'Shop lighting installation',
-          category: 'Commercial wiring',
-          location: 'Surulere',
-          status: EkoTrustProofStatus.pending,
-          summary: 'Awaiting second peer attestation from community guild.',
-          icon: Icons.home_repair_service_rounded,
-        ),
-      ];
+  int _computeTrustScore(int jobs, int onboardingStep) {
+    var score = (onboardingStep * 10).clamp(0, 40);
+    score += (jobs * 5).clamp(0, 60);
+    return score.clamp(0, 100);
+  }
+
+  EkoTrustVerificationLevel _computeLevel(int jobs, int step) {
+    if (step < 1 || jobs < 5) return EkoTrustVerificationLevel.bronze;
+    if (jobs < 20) return EkoTrustVerificationLevel.silver;
+    if (jobs < 60) return EkoTrustVerificationLevel.gold;
+    return EkoTrustVerificationLevel.platinum;
+  }
+
+  List<EkoTrustWorkProof> get workProofs => List.unmodifiable(_workProofs);
 
   int passwordStrength(String password) {
     var score = 0;
@@ -235,6 +231,7 @@ class EkoTrustController extends ChangeNotifier {
       recoveryContactEnabled: draft.recoveryContactEnabled,
     );
     await _storeAccount(account, password: draft.password);
+    await _restoreWorkProofs();
     _registering = false;
     _authMessage = 'Account protected. Continue verification.';
     notifyListeners();
@@ -288,6 +285,7 @@ class EkoTrustController extends ChangeNotifier {
         return false;
       }
       _account = EkoTrustAccount.fromJson(json);
+      await _restoreWorkProofs();
       final sessionToken = hexFromBytes(_randomBytes(32));
       await _secureStorage.write(
         key: _sessionStorageKey,
@@ -312,6 +310,7 @@ class EkoTrustController extends ChangeNotifier {
     await _secureStorage.delete(key: _sessionStorageKey);
     _account = null;
     _onboardingStep = 0;
+    _workProofs.clear();
     _authMessage = 'Signed out from this device.';
     notifyListeners();
   }
@@ -430,8 +429,21 @@ class EkoTrustController extends ChangeNotifier {
       await _uploadEvidence(proof.id, 'before', before);
       await _uploadEvidence(proof.id, 'after', after);
       _aiReviewQueued = true;
+      final sealedProof = EkoTrustWorkProof(
+        id: proof.id,
+        title: proof.title.isEmpty ? 'New verified work evidence' : proof.title,
+        category: proof.category.isEmpty ? 'Work proof' : proof.category,
+        location: proof.location.isEmpty ? profile.location : proof.location,
+        status: EkoTrustProofStatus.passed,
+        summary: 'Evidence uploaded, sealed, and ready for review.',
+        icon: proof.icon,
+      );
+      _workProofs.insert(0, sealedProof);
+      await _persistWorkProof(sealedProof);
       _uploadState = EkoTrustUploadState.complete;
       _uploadMessage = 'Evidence uploaded and queued for AI review';
+      _beforeEvidence = null;
+      _afterEvidence = null;
       notifyListeners();
     } catch (error) {
       _uploadState = EkoTrustUploadState.failed;
@@ -453,6 +465,7 @@ class EkoTrustController extends ChangeNotifier {
         _account = EkoTrustAccount.fromJson(
           jsonDecode(payload) as Map<String, dynamic>,
         );
+        await _restoreWorkProofs();
       }
     } catch (_) {
       _authMessage = 'Account storage is locked. Register or sign in again.';
@@ -495,6 +508,38 @@ class EkoTrustController extends ChangeNotifier {
       }),
     );
     _account = account;
+  }
+
+  Future<void> _restoreWorkProofs() async {
+    final account = _account;
+    if (account == null) return;
+
+    try {
+      final rows = await _offlineSyncService
+          .listWorkProofs('resident-${_profileSlug(account.fullName)}');
+      _workProofs
+        ..clear()
+        ..addAll(rows.map(EkoTrustWorkProof.fromJson));
+    } catch (_) {
+      _workProofs.clear();
+    }
+  }
+
+  Future<void> _persistWorkProof(EkoTrustWorkProof proof) async {
+    try {
+      await _offlineSyncService.saveWorkProof({
+        'id': proof.id,
+        'artisanId': profile.id,
+        'title': proof.title,
+        'category': proof.category,
+        'location': proof.location,
+        'status': proof.status.name,
+        'summary': proof.summary,
+        'createdAt': DateTime.now().toUtc().toIso8601String(),
+      });
+    } catch (_) {
+      // Local persistence should never block the user's proof submission.
+    }
   }
 
   List<int> _randomBytes(int length) {

@@ -31,7 +31,7 @@ class OfflineSyncService {
 
     final db = await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -60,6 +60,8 @@ class OfflineSyncService {
       CREATE INDEX proof_queue_status_created_idx
       ON proof_queue(status, created_at)
     ''');
+
+    await _createWorkProofsTable(db);
   }
 
   Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
@@ -68,6 +70,29 @@ class OfflineSyncService {
           'ALTER TABLE proof_queue RENAME TO proof_queue_legacy_plaintext');
       await _createDB(db, newVersion);
     }
+    if (oldVersion < 3) {
+      await _createWorkProofsTable(db);
+    }
+  }
+
+  Future<void> _createWorkProofsTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS work_proofs (
+        id TEXT PRIMARY KEY,
+        artisan_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        category TEXT NOT NULL,
+        location TEXT NOT NULL,
+        status TEXT NOT NULL,
+        summary TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE INDEX IF NOT EXISTS work_proofs_artisan_created_idx
+      ON work_proofs(artisan_id, created_at DESC)
+    ''');
   }
 
   Future<void> recoverInterruptedUploads() async {
@@ -207,6 +232,50 @@ class OfflineSyncService {
     return {
       for (final row in rows) row['status'] as String: row['count'] as int,
     };
+  }
+
+  Future<void> saveWorkProof(Map<String, dynamic> proof) async {
+    final db = await database;
+    final now = DateTime.now().toUtc().toIso8601String();
+    await db.insert(
+      'work_proofs',
+      {
+        'id': proof['id'].toString(),
+        'artisan_id': proof['artisanId'].toString(),
+        'title': proof['title'].toString(),
+        'category': proof['category'].toString(),
+        'location': proof['location'].toString(),
+        'status': proof['status'].toString(),
+        'summary': proof['summary'].toString(),
+        'created_at': (proof['createdAt'] ?? now).toString(),
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> listWorkProofs(String artisanId) async {
+    final db = await database;
+    final rows = await db.query(
+      'work_proofs',
+      where: 'artisan_id = ?',
+      whereArgs: [artisanId],
+      orderBy: 'created_at DESC',
+    );
+
+    return rows
+        .map(
+          (row) => {
+            'id': row['id'],
+            'artisanId': row['artisan_id'],
+            'title': row['title'],
+            'category': row['category'],
+            'location': row['location'],
+            'status': row['status'],
+            'summary': row['summary'],
+            'createdAt': row['created_at'],
+          },
+        )
+        .toList(growable: false);
   }
 
   Future<String> _encryptJson(Map<String, dynamic> payload) async {

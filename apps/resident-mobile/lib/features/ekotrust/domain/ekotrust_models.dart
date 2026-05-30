@@ -222,8 +222,9 @@ class EkoTrustWorkProof {
       category: (json['category'] ?? '').toString(),
       location: (json['location'] ?? '').toString(),
       status: _proofStatusFromApi((json['status'] ?? '').toString()),
-      summary:
-          '${(json['category'] ?? 'Work proof').toString()} evidence captured',
+      summary: (json['summary'] ??
+              '${(json['category'] ?? 'Work proof').toString()} evidence captured')
+          .toString(),
       icon: _iconForCategory((json['category'] ?? '').toString()),
     );
   }
@@ -268,11 +269,16 @@ EkoTrustVerificationLevel _levelFromApi(String value) {
 
 EkoTrustProofStatus _proofStatusFromApi(String value) {
   switch (value.toUpperCase()) {
+    case 'PASSED':
     case 'AI_PASSED':
     case 'PEER_CONFIRMED':
       return EkoTrustProofStatus.passed;
     case 'FLAGGED':
       return EkoTrustProofStatus.flagged;
+    case 'PENDING':
+    case 'QUEUED':
+    case 'UNDER_REVIEW':
+      return EkoTrustProofStatus.pending;
     default:
       return EkoTrustProofStatus.pending;
   }
